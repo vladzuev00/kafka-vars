@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class KafkaAdminFactory {
 
-    public static KafkaAdmin kafkaAdmin(String bootstrapAddress) {
+    public static KafkaAdmin create(String bootstrapAddress) {
         Map<String, Object> configs = new HashMap<>();
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
         return new KafkaAdmin(configs);
