@@ -6,4 +6,16 @@ public interface KafkaVars {
 
     String NOTIFICATION_BACKLOG_TOPIC_NAME = "notification-backlog";
     String NOTIFICATION_BACKLOG_GROUP_ID = "notification-backlog";
+
+    String RECEIVED_COMMANDS_LOG_TOPIC_NAME = "received-commands-log";
+    String RECEIVED_COMMANDS_LOG_GROUP_ID = "received-commands-log";
+
+    String COMMANDS_TO_SEND_LOG_TOPIC_NAME = "commands-to-send-log";
+    String COMMANDS_TO_SEND_LOG_GROUP_ID = "commands-to-send-log";
+
+    String UNIT_ACTIONS_LOG_TOPIC_NAME = "unit-actions-log";
+    String UNIT_ACTIONS_LOG_GROUP_ID = "unit-actions-log";
+
+    String UNIT_RECONNECT_HOOK_TOPIC_NAME = "unit-reconnect-hook-log";
+    String UNIT_RECONNECT_HOOK_GROUP_ID = "unit-reconnect-hook-log";
 }
