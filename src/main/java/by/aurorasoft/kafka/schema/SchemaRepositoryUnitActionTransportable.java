@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.schema;
 
-import by.aurorasoft.kafka.model.CommandTransportable;
 import by.aurorasoft.kafka.model.UnitActionTransportable;
 import org.apache.avro.Schema;
 import org.apache.avro.reflect.ReflectData;
