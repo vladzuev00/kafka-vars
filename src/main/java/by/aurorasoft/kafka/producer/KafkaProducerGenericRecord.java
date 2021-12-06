@@ -9,7 +9,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.ByteArrayOutputStream;
 
-public abstract class KafkaProducerGenericRecord<TOPIC_KEY, TRANSPORTABLE> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, TRANSPORTABLE> {
+public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_POJO, TRANSPORTABLE> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, TRANSPORTABLE> {
 
     public KafkaProducerGenericRecord(String topicName, KafkaTemplate<TOPIC_KEY, GenericRecord> kafkaTemplate, Schema schema) {
         super(topicName, kafkaTemplate, schema);
@@ -23,8 +23,14 @@ public abstract class KafkaProducerGenericRecord<TOPIC_KEY, TRANSPORTABLE> exten
         kafkaTemplate.send(topicName, record);
     }
 
+    public void sendModel(APP_POJO model) {
+        send(convert(model));
+    }
+
+    protected abstract TRANSPORTABLE convert(APP_POJO pojo);
+
     protected boolean isSendable(TRANSPORTABLE transportable) {
-        return true;
+        return transportable != null;
     }
 
     private GenericRecord pojoToRecord(TRANSPORTABLE model) {
