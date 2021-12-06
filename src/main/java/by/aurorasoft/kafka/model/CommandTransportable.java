@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.config.model;
+package by.aurorasoft.kafka.model;
 
 import org.apache.avro.reflect.Nullable;
 

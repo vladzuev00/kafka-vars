@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.config.variables;
+package by.aurorasoft.kafka.variables;
 
 public interface KafkaVars {
 

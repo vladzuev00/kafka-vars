@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.config.topic;
+package by.aurorasoft.kafka.topic;
 
 import org.apache.kafka.clients.admin.NewTopic;
 

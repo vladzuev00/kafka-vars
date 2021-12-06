@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.config.serialize;
+package by.aurorasoft.kafka.serialize;
 
 
 import org.apache.avro.Schema;

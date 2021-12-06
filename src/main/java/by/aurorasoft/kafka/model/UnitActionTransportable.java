@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.config.model;
+package by.aurorasoft.kafka.model;
 
 public class UnitActionTransportable {
 
