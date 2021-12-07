@@ -4,6 +4,18 @@ import org.apache.kafka.clients.admin.NewTopic;
 
 public class KafkaTopicFactory {
 
+    /**
+     *     @Value(value = "${kafka.topic.received-commands.partitions-number}")
+     *     private String receivedCommandsPartitionsNumber;
+     *     @Value(value = "${kafka.topic.received-commands.replication-factor}")
+     *     private String receivedCommandsReplicationFactor;
+     *
+     *     @Bean
+     *     public NewTopic receivedCommands() {
+     *         return KafkaTopicFactory.create(KafkaVars.RECEIVED_COMMANDS_LOG_TOPIC_NAME, receivedCommandsPartitionsNumber, receivedCommandsReplicationFactor);
+     *     }
+     *
+     */
     public static NewTopic create(String name, String numberPartitions, String replicationFactor) {
 
         return new NewTopic(name, parseInt(name, numberPartitions), (short) parseInt(name, replicationFactor));
