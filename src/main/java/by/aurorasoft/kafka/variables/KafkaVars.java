@@ -19,6 +19,6 @@ public interface KafkaVars {
     String UNIT_RECONNECT_HOOK_TOPIC_NAME = "unit-reconnect-hook-log";
     String UNIT_RECONNECT_HOOK_GROUP_ID = "unit-reconnect-hook-log";
 
-    String TELEGRAM_MESSAGE_TOPIC_NAME = "telegram-messages";
-    String TELEGRAM_MESSAGE_GROUP_ID = "telegram-messages";
+    String TELEGRAM_MESSAGES_TOPIC_NAME = "telegram-messages";
+    String TELEGRAM_MESSAGES_GROUP_ID = "telegram-messages";
 }

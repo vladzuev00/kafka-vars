@@ -8,6 +8,7 @@ import org.apache.avro.reflect.ReflectDatumWriter;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Collection;
 
 public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_MODEL, TRANSPORTABLE> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, TRANSPORTABLE> {
 
@@ -25,6 +26,10 @@ public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_MODEL, TRANSPORT
 
     public void sendModel(APP_MODEL model) {
         send(convert(model));
+    }
+
+    public void sendModel(Collection<APP_MODEL> pojos){
+        pojos.forEach(this::sendModel);
     }
 
     protected abstract TRANSPORTABLE convert(APP_MODEL pojo);
