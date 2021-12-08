@@ -16,6 +16,9 @@ public interface KafkaVars {
     String UNIT_ACTIONS_LOG_TOPIC_NAME = "unit-actions-log";
     String UNIT_ACTIONS_LOG_GROUP_ID = "unit-actions-log";
 
+    String USER_ACTIONS_LOG_TOPIC_NAME = "user-actions-log";
+    String USER_ACTIONS_LOG_GROUP_ID = "user-actions-log";
+
     String UNIT_RECONNECT_HOOK_TOPIC_NAME = "unit-reconnect-hook-log";
     String UNIT_RECONNECT_HOOK_GROUP_ID = "unit-reconnect-hook-log";
 
