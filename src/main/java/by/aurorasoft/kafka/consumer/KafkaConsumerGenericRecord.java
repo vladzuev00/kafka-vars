@@ -4,7 +4,7 @@ import org.apache.avro.generic.GenericRecord;
 
 import java.time.Instant;
 
-public abstract class KafkaConsumerGenericRecord <POJO> extends KafkaConsumerAbstract<GenericRecord> {
+public abstract class KafkaConsumerGenericRecord<POJO> extends KafkaConsumerAbstract<GenericRecord> {
 
     protected abstract POJO map(GenericRecord record);
 
@@ -12,7 +12,7 @@ public abstract class KafkaConsumerGenericRecord <POJO> extends KafkaConsumerAbs
         return (long) record.get(name);
     }
 
-    protected int getInt(GenericRecord record, String name){
+    protected int getInt(GenericRecord record, String name) {
         return (int) record.get(name);
     }
 
@@ -20,11 +20,15 @@ public abstract class KafkaConsumerGenericRecord <POJO> extends KafkaConsumerAbs
         return (Long) record.get(name);
     }
 
-    protected String getString(GenericRecord record, String name){
+    protected String getString(GenericRecord record, String name) {
         return record.get(name).toString();
     }
 
-    protected Instant getInstant(GenericRecord record, String name){
+    protected boolean getBoolean(GenericRecord record, String name) {
+        return (boolean) record.get(name);
+    }
+
+    protected Instant getInstant(GenericRecord record, String name) {
         return Instant.ofEpochSecond((long) record.get(name));
     }
 }
