@@ -16,6 +16,16 @@ public abstract class KafkaProducerGenericRecordBase<TOPIC_KEY, TRANSPORTABLE> e
         super(topicName, kafkaTemplate, schema);
     }
 
+    @Override
+    public void send(TRANSPORTABLE transportable) {
+        GenericRecord record = pojoToRecord(transportable);
+        send(record);
+    }
+
+    protected void send(GenericRecord record) {
+        kafkaTemplate.send(topicName, record);
+    }
+
     protected GenericRecord pojoToRecord(TRANSPORTABLE model) {
         try {
             ReflectDatumWriter<TRANSPORTABLE> datumWriter = new ReflectDatumWriter<>(schema);

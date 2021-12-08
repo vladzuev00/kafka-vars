@@ -16,8 +16,7 @@ public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_MODEL, TRANSPORT
         if (!isSendable(transportable)) {
             return;
         }
-        GenericRecord record = pojoToRecord(transportable);
-        kafkaTemplate.send(topicName, record);
+        send(transportable);
     }
 
     public void sendModel(APP_MODEL model) {
