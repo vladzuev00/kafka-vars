@@ -16,7 +16,7 @@ public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_MODEL, TRANSPORT
         if (!isSendable(transportable)) {
             return;
         }
-        send(transportable);
+        super.send(transportable);
     }
 
     public void sendModel(APP_MODEL model) {
