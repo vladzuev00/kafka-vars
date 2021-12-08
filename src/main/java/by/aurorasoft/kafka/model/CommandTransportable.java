@@ -2,6 +2,8 @@ package by.aurorasoft.kafka.model;
 
 import org.apache.avro.reflect.Nullable;
 
+import java.util.Objects;
+
 public class CommandTransportable {
     @Nullable
     private final Long id;
@@ -59,5 +61,18 @@ public class CommandTransportable {
 
     public int getLifeTimeout() {
         return lifeTimeout;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CommandTransportable)) return false;
+        CommandTransportable that = (CommandTransportable) o;
+        return getUnitId() == that.getUnitId() && getActualEpoch() == that.getActualEpoch() && getCreatedEpoch() == that.getCreatedEpoch() && getLifeTimeout() == that.getLifeTimeout() && Objects.equals(getId(), that.getId()) && Objects.equals(getText(), that.getText()) && Objects.equals(getCommandType(), that.getCommandType()) && Objects.equals(getProviderType(), that.getProviderType());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUnitId(), getText(), getCommandType(), getProviderType(), getActualEpoch(), getCreatedEpoch(), getLifeTimeout());
     }
 }

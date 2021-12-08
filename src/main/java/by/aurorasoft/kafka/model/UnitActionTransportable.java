@@ -1,5 +1,7 @@
 package by.aurorasoft.kafka.model;
 
+import java.util.Objects;
+
 public class UnitActionTransportable {
 
     private final long unitId;
@@ -28,5 +30,18 @@ public class UnitActionTransportable {
 
     public long getTimeSeconds() {
         return timeSeconds;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UnitActionTransportable)) return false;
+        UnitActionTransportable that = (UnitActionTransportable) o;
+        return getUnitId() == that.getUnitId() && getTimeSeconds() == that.getTimeSeconds() && Objects.equals(getType(), that.getType()) && Objects.equals(getMessage(), that.getMessage());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getUnitId(), getType(), getMessage(), getTimeSeconds());
     }
 }

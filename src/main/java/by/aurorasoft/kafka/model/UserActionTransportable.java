@@ -2,6 +2,8 @@ package by.aurorasoft.kafka.model;
 
 import org.apache.avro.reflect.Nullable;
 
+import java.util.Objects;
+
 public class UserActionTransportable {
     private final Long id;
     private final long userId;
@@ -63,5 +65,18 @@ public class UserActionTransportable {
 
     public String getClient() {
         return client;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof UserActionTransportable)) return false;
+        UserActionTransportable that = (UserActionTransportable) o;
+        return getUserId() == that.getUserId() && getTimeSeconds() == that.getTimeSeconds() && Objects.equals(getId(), that.getId()) && Objects.equals(getIp(), that.getIp()) && Objects.equals(getMethod(), that.getMethod()) && Objects.equals(getUri(), that.getUri()) && Objects.equals(getParams(), that.getParams()) && Objects.equals(getBody(), that.getBody()) && Objects.equals(getClient(), that.getClient());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId(), getUserId(), getTimeSeconds(), getIp(), getMethod(), getUri(), getParams(), getBody(), getClient());
     }
 }

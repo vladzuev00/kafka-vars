@@ -24,4 +24,7 @@ public interface KafkaVars {
 
     String TELEGRAM_MESSAGES_TOPIC_NAME = "telegram-messages";
     String TELEGRAM_MESSAGES_GROUP_ID = "telegram-messages";
+
+    String UNIT_LOG_TOPIC_NAME = "unit-log";
+    String UNIT_LOG_GROUP_ID = "unit-log";
 }
