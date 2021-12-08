@@ -38,7 +38,7 @@ public abstract class KafkaProducerGenericRecord<TOPIC_KEY, APP_MODEL, TRANSPORT
         return transportable != null;
     }
 
-    private GenericRecord pojoToRecord(TRANSPORTABLE model) {
+    protected GenericRecord pojoToRecord(TRANSPORTABLE model) {
         try {
             ReflectDatumWriter<TRANSPORTABLE> datumWriter = new ReflectDatumWriter<>(schema);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
