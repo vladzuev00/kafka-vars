@@ -21,8 +21,6 @@ public class KafkaAdminFactory {
      *         return KafkaAdminFactory.create(bootstrapAddress);
      *     }
      * }
-     *
-     *
      */
     public static KafkaAdmin create(String bootstrapAddress) {
         Map<String, Object> configs = new HashMap<>();
