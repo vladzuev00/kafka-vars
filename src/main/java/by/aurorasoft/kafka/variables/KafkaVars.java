@@ -27,4 +27,7 @@ public interface KafkaVars {
 
     String UNIT_LOG_TOPIC_NAME = "unit-log";
     String UNIT_LOG_GROUP_ID = "unit-log";
+
+    String MESSAGES_TOPIC_NAME = "messages";
+    String MESSAGES_LOG_GROUP_ID = "messages";
 }
