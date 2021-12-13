@@ -9,7 +9,7 @@ public class MessageTransportable {
     private final float longitude;
     private final int altitude;
     private final int speed;
-    private final int amount_satellite;
+    private final int amountSatellite;
     private final int course;
     private final String params;
     private final long unitId;
@@ -22,7 +22,7 @@ public class MessageTransportable {
                                 float longitude,
                                 int altitude,
                                 int speed,
-                                int amount_satellite,
+                                int amountSatellite,
                                 int course,
                                 String params,
                                 long unitId,
@@ -34,7 +34,7 @@ public class MessageTransportable {
         this.longitude = longitude;
         this.altitude = altitude;
         this.speed = speed;
-        this.amount_satellite = amount_satellite;
+        this.amountSatellite = amountSatellite;
         this.course = course;
         this.params = params;
         this.unitId = unitId;
@@ -66,8 +66,8 @@ public class MessageTransportable {
         return speed;
     }
 
-    public int getAmount_satellite() {
-        return amount_satellite;
+    public int getAmountSatellite() {
+        return amountSatellite;
     }
 
     public int getCourse() {
