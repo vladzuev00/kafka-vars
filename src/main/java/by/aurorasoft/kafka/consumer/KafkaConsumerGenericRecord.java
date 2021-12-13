@@ -20,6 +20,10 @@ public abstract class KafkaConsumerGenericRecord<POJO> extends KafkaConsumerAbst
         return (Long) record.get(name);
     }
 
+    protected float getFloat(GenericRecord record, String name) {
+        return (float) record.get(name);
+    }
+
     protected String getString(GenericRecord record, String name) {
         return record.get(name).toString();
     }
