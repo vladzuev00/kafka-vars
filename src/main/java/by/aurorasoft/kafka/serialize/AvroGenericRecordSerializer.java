@@ -2,13 +2,14 @@ package by.aurorasoft.kafka.serialize;
 
 
 import org.apache.avro.Schema;
-import org.apache.avro.file.DataFileWriter;
 import org.apache.avro.generic.GenericDatumWriter;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.avro.io.BinaryEncoder;
+import org.apache.avro.io.DatumWriter;
+import org.apache.avro.io.EncoderFactory;
 import org.apache.kafka.common.serialization.Serializer;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.Map;
 
 public class AvroGenericRecordSerializer implements Serializer<GenericRecord> {
@@ -22,22 +23,21 @@ public class AvroGenericRecordSerializer implements Serializer<GenericRecord> {
 
     @Override
     public byte[] serialize(String arg0, GenericRecord record) {
-        byte[] retVal = null;
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        GenericDatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
-
-        DataFileWriter dataFileWriter = new DataFileWriter<>(datumWriter);
+        byte[] bytes = null;
         try {
-            dataFileWriter.create(schema, outputStream);
-            dataFileWriter.append(record);
-            dataFileWriter.flush();
-            dataFileWriter.close();
-            retVal = outputStream.toByteArray();
-        } catch (IOException e) {
+            if (record != null) {
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                BinaryEncoder binaryEncoder = EncoderFactory.get().binaryEncoder(byteArrayOutputStream, null);
+                DatumWriter<GenericRecord> datumWriter = new GenericDatumWriter<>(schema);
+                datumWriter.write(record, binaryEncoder);
+                binaryEncoder.flush();
+                byteArrayOutputStream.close();
+                bytes = byteArrayOutputStream.toByteArray();
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return retVal;
+        return bytes;
     }
 
     @Override
