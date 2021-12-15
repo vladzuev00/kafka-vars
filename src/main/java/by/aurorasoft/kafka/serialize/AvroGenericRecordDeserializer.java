@@ -39,4 +39,9 @@ public class AvroGenericRecordDeserializer implements Deserializer {
         }
         return records;
     }
+
+    @Override
+    public void close() {
+
+    }
 }
