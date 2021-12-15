@@ -1,10 +1,11 @@
 package by.aurorasoft.kafka.consumer;
 
 import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.common.internals.Topic;
 
 import java.time.Instant;
 
-public abstract class KafkaConsumerGenericRecord<POJO> extends KafkaConsumerAbstract<GenericRecord> {
+public abstract class KafkaConsumerGenericRecord<TOPIC_KEY, POJO> extends KafkaConsumerAbstract<TOPIC_KEY, GenericRecord> {
 
     protected abstract POJO map(GenericRecord record);
 
