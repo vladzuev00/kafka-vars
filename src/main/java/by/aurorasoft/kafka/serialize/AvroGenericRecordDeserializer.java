@@ -10,6 +10,7 @@ import org.apache.kafka.common.serialization.Deserializer;
 
 import java.util.Map;
 
+//https://medium.com/@mailshine/apache-avro-quick-example-in-kafka-7b2909396c02
 public class AvroGenericRecordDeserializer implements Deserializer {
     private Schema schema = null;
 
@@ -17,25 +18,6 @@ public class AvroGenericRecordDeserializer implements Deserializer {
     public void configure(Map configs, boolean isKey) {
         schema = (Schema) configs.get("SCHEMA");
     }
-
-//    @Override
-//    public Object deserialize(String s, byte[] bytes) {
-//        DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
-//        SeekableByteArrayInput arrayInput = new SeekableByteArrayInput(bytes);
-//        List<GenericRecord> records = new ArrayList<>();
-//
-//        DataFileReader<GenericRecord> dataFileReader;
-//        try {
-//            dataFileReader = new DataFileReader<>(arrayInput, datumReader);
-//            while (dataFileReader.hasNext()) {
-//                GenericRecord record = dataFileReader.next();
-//                records.add(record);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//        return records;
-//    }
 
     @Override
     public Object deserialize(String topic, byte[] bytes) {
