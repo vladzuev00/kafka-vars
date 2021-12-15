@@ -42,6 +42,6 @@ public class AvroGenericRecordDeserializer implements Deserializer {
 
     @Override
     public void close() {
-
+        // do nothing
     }
 }
