@@ -2,6 +2,7 @@ package by.aurorasoft.kafka.producer;
 
 import org.apache.avro.Schema;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.ui.Model;
 
 import java.util.Collection;
 
@@ -11,19 +12,21 @@ public abstract class KafkaProducerAbstractModel<TOPIC_KEY, TOPIC_VALUE, MODEL> 
         super(topicName, kafkaTemplate, schema);
     }
 
-    public void send(MODEL model) {
+    public abstract void produce(MODEL model);
+
+    protected void send(MODEL model) {
         sendKafka(convert(model));
     }
 
-    public void send(TOPIC_KEY key, MODEL model) {
+    protected void send(TOPIC_KEY key, MODEL model) {
         sendKafka(key, convert(model));
     }
 
-    public void send(Collection<MODEL> list) {
+    protected void send(Collection<MODEL> list) {
         list.forEach(model -> sendKafka(convert(model)));
     }
 
-    public void send(TOPIC_KEY key, Collection<MODEL> list) {
+    protected void send(TOPIC_KEY key, Collection<MODEL> list) {
         list.forEach(model -> sendKafka(key, convert(model)));
     }
 

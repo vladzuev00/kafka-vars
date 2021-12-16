@@ -16,21 +16,21 @@ public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, INTERMED
         super(topicName, kafkaTemplate, schema);
     }
 
-    public void sendModel(MODEL model) {
+    protected void sendModel(MODEL model) {
         INTERMEDIARY intermediary = convertIntermediary(model);
         send(intermediary);
     }
 
-    public void sendModel(TOPIC_KEY key, MODEL model) {
+    protected void sendModel(TOPIC_KEY key, MODEL model) {
         INTERMEDIARY intermediary = convertIntermediary(model);
         send(key, intermediary);
     }
 
-    public void sendModel(TOPIC_KEY key, Collection<MODEL> list) {
+    protected void sendModel(TOPIC_KEY key, Collection<MODEL> list) {
         list.forEach(model -> sendModel(key, model));
     }
 
-    public void sendModel(Collection<MODEL> list) {
+    protected void sendModel(Collection<MODEL> list) {
         list.forEach(model -> sendModel(model));
     }
 

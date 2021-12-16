@@ -30,7 +30,7 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE> {
         kafkaTemplate.send(producerRecord);
     }
 
-    public boolean isNotSendable(TOPIC_VALUE value) {
+    protected boolean isNotSendable(TOPIC_VALUE value) {
         return false;
     }
 }
