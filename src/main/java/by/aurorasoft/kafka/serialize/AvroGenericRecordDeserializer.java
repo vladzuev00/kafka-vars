@@ -1,5 +1,6 @@
 package by.aurorasoft.kafka.serialize;
 
+import by.aurorasoft.kafka.variables.KafkaVars;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericDatumReader;
 import org.apache.avro.generic.GenericRecord;
@@ -16,7 +17,7 @@ public class AvroGenericRecordDeserializer implements Deserializer {
 
     @Override
     public void configure(Map configs, boolean isKey) {
-        schema = (Schema) configs.get("SCHEMA");
+        schema = (Schema) configs.get(KafkaVars.SCHEMA_PROP_NAME);
     }
 
     @Override
