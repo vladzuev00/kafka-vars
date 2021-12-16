@@ -4,7 +4,10 @@ import org.apache.avro.Schema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
-public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE> {
+import java.util.Collection;
+
+public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, INTERMEDIATE, MODEL> {
+
     protected final KafkaTemplate<TOPIC_KEY, TOPIC_VALUE> kafkaTemplate;
     protected final String topicName;
     protected final Schema schema;
@@ -15,22 +18,40 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE> {
         this.schema = schema;
     }
 
-    public void sendKafka(TOPIC_VALUE value) {
+    public abstract void send(MODEL model);
+
+    protected abstract INTERMEDIATE convertModelToIntermediary(MODEL model);
+
+    protected abstract TOPIC_VALUE convertIntermediateToTopicValue(INTERMEDIATE intermediate);
+
+    public void send(Collection<MODEL> models){
+        models.forEach(this::send);
+    }
+
+    protected void sendModel(TOPIC_KEY key, MODEL model) {
+        TOPIC_VALUE value = topicValue(model);
+        sendKafka(key, value);
+    }
+
+    protected void sendModel(MODEL model) {
+        TOPIC_VALUE value = topicValue(model);
+        sendKafka(value);
+    }
+
+    protected TOPIC_VALUE topicValue(MODEL model) {
+        INTERMEDIATE intermediate = convertModelToIntermediary(model);
+        return convertIntermediateToTopicValue(intermediate);
+    }
+
+    protected void sendKafka(TOPIC_VALUE value) {
         sendKafka(new ProducerRecord<>(topicName, value));
     }
 
-    public void sendKafka(TOPIC_KEY key, TOPIC_VALUE value) {
+    protected void sendKafka(TOPIC_KEY key, TOPIC_VALUE value) {
         sendKafka(new ProducerRecord<>(topicName, key, value));
     }
 
-    public void sendKafka(ProducerRecord<TOPIC_KEY, TOPIC_VALUE> producerRecord) {
-        if (isNotSendable(producerRecord.value())) {
-            return;
-        }
+    protected void sendKafka(ProducerRecord<TOPIC_KEY, TOPIC_VALUE> producerRecord) {
         kafkaTemplate.send(producerRecord);
-    }
-
-    protected boolean isNotSendable(TOPIC_VALUE value) {
-        return false;
     }
 }

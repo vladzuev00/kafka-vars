@@ -8,31 +8,29 @@ import org.apache.avro.reflect.ReflectDatumWriter;
 import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.ByteArrayOutputStream;
-import java.util.Collection;
 
-public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, INTERMEDIARY, MODEL> extends KafkaProducerGenericRecord<TOPIC_KEY, INTERMEDIARY> {
+public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, INTERMEDIARY, MODEL> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, INTERMEDIARY, MODEL> {
 
     public KafkaProducerGenericRecordIntermediary(String topicName, KafkaTemplate<TOPIC_KEY, GenericRecord> kafkaTemplate, Schema schema) {
         super(topicName, kafkaTemplate, schema);
     }
 
-    protected void sendModel(MODEL model) {
-        INTERMEDIARY intermediary = convertIntermediary(model);
-        send(intermediary);
-    }
+    @Override
+    protected GenericRecord convertIntermediateToTopicValue(INTERMEDIARY model) {
+        try {
+            ReflectDatumWriter<INTERMEDIARY> datumWriter = new ReflectDatumWriter<>(schema);
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-    protected void sendModel(TOPIC_KEY key, MODEL model) {
-        INTERMEDIARY intermediary = convertIntermediary(model);
-        send(key, intermediary);
-    }
+            BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);
+            datumWriter.write(model, encoder);
+            encoder.flush();
 
-    protected void sendModel(TOPIC_KEY key, Collection<MODEL> list) {
-        list.forEach(model -> sendModel(key, model));
-    }
+            DatumReader<GenericRecord> datumReader = new GenericDatumReader<>(schema);
+            BinaryDecoder decoder = DecoderFactory.get().binaryDecoder(outputStream.toByteArray(), null);
 
-    protected void sendModel(Collection<MODEL> list) {
-        list.forEach(model -> sendModel(model));
+            return datumReader.read(null, decoder);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
-
-    protected abstract INTERMEDIARY convertIntermediary(MODEL model);
 }
