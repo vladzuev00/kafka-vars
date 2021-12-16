@@ -9,16 +9,16 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.io.ByteArrayOutputStream;
 
-public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, INTERMEDIARY, MODEL> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, INTERMEDIARY, MODEL> {
+public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, TRANSPORTABLE, MODEL> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, TRANSPORTABLE, MODEL> {
 
     public KafkaProducerGenericRecordIntermediary(String topicName, KafkaTemplate<TOPIC_KEY, GenericRecord> kafkaTemplate, Schema schema) {
         super(topicName, kafkaTemplate, schema);
     }
 
     @Override
-    protected GenericRecord convertIntermediateToTopicValue(INTERMEDIARY model) {
+    protected GenericRecord convertTransportableToTopicValue(TRANSPORTABLE model) {
         try {
-            ReflectDatumWriter<INTERMEDIARY> datumWriter = new ReflectDatumWriter<>(schema);
+            ReflectDatumWriter<TRANSPORTABLE> datumWriter = new ReflectDatumWriter<>(schema);
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
             BinaryEncoder encoder = EncoderFactory.get().binaryEncoder(outputStream, null);

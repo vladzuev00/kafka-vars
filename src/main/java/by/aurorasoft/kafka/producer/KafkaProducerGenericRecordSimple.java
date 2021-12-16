@@ -11,7 +11,7 @@ public abstract class KafkaProducerGenericRecordSimple<TOPIC_KEY, MODEL> extends
     }
 
     @Override
-    protected MODEL convertModelToIntermediary(MODEL model) {
+    protected MODEL convertModelToTransportable(MODEL model) {
         return model;
     }
 }

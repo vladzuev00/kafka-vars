@@ -10,7 +10,7 @@ public abstract class KafkaProducerGeneric<TOPIC_KEY, TOPIC_VALUE, MODEL> extend
     }
 
     @Override
-    protected MODEL convertModelToIntermediary(MODEL model) {
+    protected MODEL convertModelToTransportable(MODEL model) {
         return model;
     }
 }

@@ -10,12 +10,12 @@ public abstract class KafkaProducerAbstractSimple<TOPIC_KEY, TOPIC_VALUE> extend
     }
 
     @Override
-    protected TOPIC_VALUE convertModelToIntermediary(TOPIC_VALUE topicValue) {
+    protected TOPIC_VALUE convertModelToTransportable(TOPIC_VALUE topicValue) {
         return topicValue;
     }
 
     @Override
-    protected TOPIC_VALUE convertIntermediateToTopicValue(TOPIC_VALUE topicValue) {
+    protected TOPIC_VALUE convertTransportableToTopicValue(TOPIC_VALUE topicValue) {
         return topicValue;
     }
 }

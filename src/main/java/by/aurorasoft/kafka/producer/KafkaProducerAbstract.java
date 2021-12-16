@@ -6,7 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Collection;
 
-public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, INTERMEDIATE, MODEL> {
+public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABLE, MODEL> {
 
     protected final KafkaTemplate<TOPIC_KEY, TOPIC_VALUE> kafkaTemplate;
     protected final String topicName;
@@ -20,9 +20,9 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, INTERMEDIATE
 
     public abstract void send(MODEL model);
 
-    protected abstract INTERMEDIATE convertModelToIntermediary(MODEL model);
+    protected abstract TRANSPORTABLE convertModelToTransportable(MODEL model);
 
-    protected abstract TOPIC_VALUE convertIntermediateToTopicValue(INTERMEDIATE intermediate);
+    protected abstract TOPIC_VALUE convertTransportableToTopicValue(TRANSPORTABLE intermediate);
 
     public void send(Collection<MODEL> models){
         models.forEach(this::send);
@@ -39,8 +39,8 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, INTERMEDIATE
     }
 
     protected TOPIC_VALUE topicValue(MODEL model) {
-        INTERMEDIATE intermediate = convertModelToIntermediary(model);
-        return convertIntermediateToTopicValue(intermediate);
+        TRANSPORTABLE transportable = convertModelToTransportable(model);
+        return convertTransportableToTopicValue(transportable);
     }
 
     protected void sendKafka(TOPIC_VALUE value) {
