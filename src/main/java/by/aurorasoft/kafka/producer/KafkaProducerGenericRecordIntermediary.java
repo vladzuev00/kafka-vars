@@ -11,8 +11,11 @@ import java.io.ByteArrayOutputStream;
 
 public abstract class KafkaProducerGenericRecordIntermediary<TOPIC_KEY, TRANSPORTABLE, MODEL> extends KafkaProducerAbstract<TOPIC_KEY, GenericRecord, TRANSPORTABLE, MODEL> {
 
+    private final Schema schema;
+
     public KafkaProducerGenericRecordIntermediary(String topicName, KafkaTemplate<TOPIC_KEY, GenericRecord> kafkaTemplate, Schema schema) {
-        super(topicName, kafkaTemplate, schema);
+        super(topicName, kafkaTemplate);
+        this.schema = schema;
     }
 
     @Override

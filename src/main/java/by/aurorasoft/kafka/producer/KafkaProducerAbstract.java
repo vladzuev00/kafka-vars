@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.producer;
 
-import org.apache.avro.Schema;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -10,12 +9,10 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABL
 
     protected final KafkaTemplate<TOPIC_KEY, TOPIC_VALUE> kafkaTemplate;
     protected final String topicName;
-    protected final Schema schema;
 
-    public KafkaProducerAbstract(String topicName, KafkaTemplate<TOPIC_KEY, TOPIC_VALUE> kafkaTemplate, Schema schema) {
+    public KafkaProducerAbstract(String topicName, KafkaTemplate<TOPIC_KEY, TOPIC_VALUE> kafkaTemplate) {
         this.topicName = topicName;
         this.kafkaTemplate = kafkaTemplate;
-        this.schema = schema;
     }
 
     public abstract void send(MODEL model);
