@@ -29,6 +29,10 @@ public abstract class KafkaConsumerGenericRecord<TOPIC_KEY, POJO> extends KafkaC
         return (float) record.get(name);
     }
 
+    protected double getDouble(GenericRecord record, String name) {
+        return (double) record.get(name);
+    }
+
     protected String getString(GenericRecord record, String name) {
         return record.get(name).toString();
     }
