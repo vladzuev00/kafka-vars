@@ -7,4 +7,5 @@ public class SubscriberServerTransportable {
     String host;
     int port;
     boolean isActive;
+    boolean deleted;
 }
