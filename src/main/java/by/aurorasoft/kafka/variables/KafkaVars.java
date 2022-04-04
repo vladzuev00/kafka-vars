@@ -28,6 +28,9 @@ public interface KafkaVars {
     String UNIT_LOG_TOPIC_NAME = "unit-log";
     String UNIT_LOG_GROUP_ID = "unit-log";
 
+    String SUBSCRIBER_SERVER_LOG_TOPIC_NAME = "subscriber-server-log";
+    String SUBSCRIBER_SERVER_LOG_GROUP_ID = "subscriber-server-log";
+
     String MESSAGES_TOPIC_NAME = "messages";
     String MESSAGES_LOG_GROUP_ID = "messages";
 }
