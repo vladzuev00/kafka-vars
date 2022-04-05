@@ -3,16 +3,16 @@ package by.aurorasoft.kafka.model;
 import java.util.Objects;
 
 public class SubscriberItemActionTransportable {
-    private final long id;
-    private final String type;
-    private final String message;
-    private final long timeSeconds;
+    protected final long id;
+    protected final String type;
+    protected final String message;
+    protected final long time;
 
-    public SubscriberItemActionTransportable(long id, String type, String message, long timeSeconds) {
+    public SubscriberItemActionTransportable(long id, String type, String message, long time) {
         this.id = id;
         this.type = type;
         this.message = message;
-        this.timeSeconds = timeSeconds;
+        this.time = time;
     }
 
     public long getId() {
@@ -27,8 +27,8 @@ public class SubscriberItemActionTransportable {
         return message;
     }
 
-    public long getTimeSeconds() {
-        return timeSeconds;
+    public long getTime() {
+        return time;
     }
 
     @Override
@@ -36,12 +36,12 @@ public class SubscriberItemActionTransportable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SubscriberItemActionTransportable that = (SubscriberItemActionTransportable) o;
-        return id == that.id && timeSeconds == that.timeSeconds && type.equals(that.type) && message.equals(that.message);
+        return id == that.id && time == that.time && type.equals(that.type) && message.equals(that.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, message, timeSeconds);
+        return Objects.hash(id, type, message, time);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class SubscriberItemActionTransportable {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", message='" + message + '\'' +
-                ", timeSeconds=" + timeSeconds +
+                ", timeSeconds=" + time +
                 '}';
     }
 }
