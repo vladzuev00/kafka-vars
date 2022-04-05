@@ -6,13 +6,13 @@ public class SubscriberItemActionTransportable {
     protected final long id;
     protected final String type;
     protected final String message;
-    protected final long time;
+    protected final long timeSeconds;
 
-    public SubscriberItemActionTransportable(long id, String type, String message, long time) {
+    public SubscriberItemActionTransportable(long id, String type, String message, long timeSeconds) {
         this.id = id;
         this.type = type;
         this.message = message;
-        this.time = time;
+        this.timeSeconds = timeSeconds;
     }
 
     public long getId() {
@@ -27,8 +27,8 @@ public class SubscriberItemActionTransportable {
         return message;
     }
 
-    public long getTime() {
-        return time;
+    public long getTimeSeconds() {
+        return timeSeconds;
     }
 
     @Override
@@ -36,12 +36,12 @@ public class SubscriberItemActionTransportable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         SubscriberItemActionTransportable that = (SubscriberItemActionTransportable) o;
-        return id == that.id && time == that.time && type.equals(that.type) && message.equals(that.message);
+        return id == that.id && timeSeconds == that.timeSeconds && type.equals(that.type) && message.equals(that.message);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, message, time);
+        return Objects.hash(id, type, message, timeSeconds);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class SubscriberItemActionTransportable {
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", message='" + message + '\'' +
-                ", timeSeconds=" + time +
+                ", timeSeconds=" + timeSeconds +
                 '}';
     }
 }
