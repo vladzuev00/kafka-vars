@@ -2,13 +2,13 @@ package by.aurorasoft.kafka.model;
 
 import java.util.Objects;
 
-public class SubscriberItemActionTransportable {
+public class RetranslatorItemActionTransportable {
     protected final long id;
     protected final String type;
     protected final String message;
     protected final long timeSeconds;
 
-    public SubscriberItemActionTransportable(long id, String type, String message, long timeSeconds) {
+    public RetranslatorItemActionTransportable(long id, String type, String message, long timeSeconds) {
         this.id = id;
         this.type = type;
         this.message = message;
@@ -35,7 +35,7 @@ public class SubscriberItemActionTransportable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SubscriberItemActionTransportable that = (SubscriberItemActionTransportable) o;
+        RetranslatorItemActionTransportable that = (RetranslatorItemActionTransportable) o;
         return id == that.id && timeSeconds == that.timeSeconds && type.equals(that.type) && message.equals(that.message);
     }
 
@@ -46,7 +46,7 @@ public class SubscriberItemActionTransportable {
 
     @Override
     public String toString() {
-        return "SubscriberItemActionTransportable{" +
+        return "RetranslatorItemActionTransportable{" +
                 "id=" + id +
                 ", type='" + type + '\'' +
                 ", message='" + message + '\'' +

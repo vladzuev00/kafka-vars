@@ -2,7 +2,7 @@ package by.aurorasoft.kafka.model;
 
 import java.util.Objects;
 
-public class SubscriberServerTransportable {
+public class RetranslatorTransportable {
     private final long id;
     private final long protocolId;
     private final String name;
@@ -11,7 +11,7 @@ public class SubscriberServerTransportable {
     private final boolean isActive;
     private final boolean deleted;
 
-    public SubscriberServerTransportable(long id, long protocolId, String name, String host, int port, boolean isActive, boolean deleted) {
+    public RetranslatorTransportable(long id, long protocolId, String name, String host, int port, boolean isActive, boolean deleted) {
         this.id = id;
         this.protocolId = protocolId;
         this.name = name;
@@ -53,7 +53,7 @@ public class SubscriberServerTransportable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        SubscriberServerTransportable that = (SubscriberServerTransportable) o;
+        RetranslatorTransportable that = (RetranslatorTransportable) o;
         return id == that.id && protocolId == that.protocolId && port == that.port && isActive == that.isActive && deleted == that.deleted && name.equals(that.name) && host.equals(that.host);
     }
 
