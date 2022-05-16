@@ -6,8 +6,6 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
 
 public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABLE, MODEL> {
 
@@ -19,18 +17,14 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABL
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public abstract ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> send(MODEL model);
+    public abstract void send(MODEL model);
 
     protected abstract TRANSPORTABLE convertModelToTransportable(MODEL model);
 
     protected abstract TOPIC_VALUE convertTransportableToTopicValue(TRANSPORTABLE intermediate);
 
-    public List<ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>>> send(Collection<MODEL> models){
-        List<ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>>> results = new LinkedList<>();
-        for (MODEL model : models) {
-            results.add(this.send(model));
-        }
-        return results;
+    public void send(Collection<MODEL> models) {
+        models.forEach(this::send);
     }
 
     protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendModel(TOPIC_KEY key, MODEL model) {
