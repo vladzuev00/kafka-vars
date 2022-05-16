@@ -1,5 +1,7 @@
 package by.aurorasoft.kafka.model;
 
+import by.nhorushko.aurutils.message.MessageType;
+
 import java.time.Instant;
 
 public class MessageTransportable {
@@ -56,13 +58,13 @@ public class MessageTransportable {
     private final String params;
     private final long unitId;
     private final boolean isArchive;
-    private final boolean isValid;
+    private final MessageType type;
 
     public MessageTransportable(Long id, Instant time, float latitude, float longitude, int altitude, int speed,
                                 int amountSatellite, int course, double gpsOdometer, int gsmStrength, int battery,
                                 int batteryVoltage, float onboardVoltage,
                                 float ecoAcceleration, float ecoBraking, float ecoCornering, float ecoBump,
-                                String params, long unitId, boolean isArchive, boolean isValid) {
+                                String params, long unitId, boolean isArchive, MessageType type) {
         this.id = id;
         this.time = time;
         this.latitude = latitude;
@@ -83,6 +85,6 @@ public class MessageTransportable {
         this.params = params;
         this.unitId = unitId;
         this.isArchive = isArchive;
-        this.isValid = isValid;
+        this.type = type;
     }
 }
