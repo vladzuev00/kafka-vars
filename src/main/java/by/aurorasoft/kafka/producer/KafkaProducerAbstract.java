@@ -2,8 +2,12 @@ package by.aurorasoft.kafka.producer;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
+import org.springframework.util.concurrent.ListenableFuture;
 
 import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABLE, MODEL> {
 
@@ -15,24 +19,28 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABL
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public abstract void send(MODEL model);
+    public abstract ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> send(MODEL model);
 
     protected abstract TRANSPORTABLE convertModelToTransportable(MODEL model);
 
     protected abstract TOPIC_VALUE convertTransportableToTopicValue(TRANSPORTABLE intermediate);
 
-    public void send(Collection<MODEL> models){
-        models.forEach(this::send);
+    public List<ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>>> send(Collection<MODEL> models){
+        List<ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>>> results = new LinkedList<>();
+        for (MODEL model : models) {
+            results.add(this.send(model));
+        }
+        return results;
     }
 
-    protected void sendModel(TOPIC_KEY key, MODEL model) {
+    protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendModel(TOPIC_KEY key, MODEL model) {
         TOPIC_VALUE value = topicValue(model);
-        sendKafka(key, value);
+        return sendKafka(key, value);
     }
 
-    protected void sendModel(MODEL model) {
+    protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendModel(MODEL model) {
         TOPIC_VALUE value = topicValue(model);
-        sendKafka(value);
+        return sendKafka(value);
     }
 
     protected TOPIC_VALUE topicValue(MODEL model) {
@@ -40,15 +48,15 @@ public abstract class KafkaProducerAbstract<TOPIC_KEY, TOPIC_VALUE, TRANSPORTABL
         return convertTransportableToTopicValue(transportable);
     }
 
-    protected void sendKafka(TOPIC_VALUE value) {
-        sendKafka(new ProducerRecord<>(topicName, value));
+    protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendKafka(TOPIC_VALUE value) {
+        return sendKafka(new ProducerRecord<>(topicName, value));
     }
 
-    protected void sendKafka(TOPIC_KEY key, TOPIC_VALUE value) {
-        sendKafka(new ProducerRecord<>(topicName, key, value));
+    protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendKafka(TOPIC_KEY key, TOPIC_VALUE value) {
+        return sendKafka(new ProducerRecord<>(topicName, key, value));
     }
 
-    protected void sendKafka(ProducerRecord<TOPIC_KEY, TOPIC_VALUE> producerRecord) {
-        kafkaTemplate.send(producerRecord);
+    protected ListenableFuture<SendResult<TOPIC_KEY, TOPIC_VALUE>> sendKafka(ProducerRecord<TOPIC_KEY, TOPIC_VALUE> producerRecord) {
+        return kafkaTemplate.send(producerRecord);
     }
 }
