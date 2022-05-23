@@ -44,4 +44,8 @@ public abstract class KafkaConsumerGenericRecord<TOPIC_KEY, POJO> extends KafkaC
     protected Instant getInstant(GenericRecord record, String name) {
         return Instant.ofEpochSecond((long) record.get(name));
     }
+
+    protected <T> T getObject(GenericRecord record, String name) {
+        return (T)record.get(name);
+    }
 }
