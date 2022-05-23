@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Value;
 import lombok.experimental.FieldNameConstants;
 
