@@ -5,15 +5,14 @@ import lombok.Value;
 import lombok.experimental.FieldNameConstants;
 import org.apache.avro.reflect.Nullable;
 
-import java.time.Instant;
-
 @Value
 @FieldNameConstants
 public class MessageTransportable {
 
     @Nullable
     Long id;
-    Instant time;
+    /** seconds */
+    long time;
     float latitude;
     float longitude;
     int altitude;
