@@ -3,6 +3,9 @@ package by.aurorasoft.kafka.topic;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.config.TopicConfig;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class KafkaTopicFactory {
 
     private static final int DAY_MS = 86_400_000;
@@ -24,19 +27,20 @@ public class KafkaTopicFactory {
      */
     public static NewTopic create(String name, String numberPartitions, String replicationFactor, int retentionDays, int retentionGb) {
         NewTopic topic = new NewTopic(name, parseInt(name, numberPartitions), (short) parseInt(name, replicationFactor));
+        Map<String, String> config = new HashMap<>();
         if (retentionDays > 0) {
-            topic.configs().put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionDays * DAY_MS));
+            config.put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionDays * DAY_MS));
         }
         if (retentionDays == -1) {
-            topic.configs().put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionDays));
+            config.put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionDays));
         }
         if (retentionGb > 0) {
-            topic.configs().put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionGb * BYTES_GB));
+            config.put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionGb * BYTES_GB));
         }
         if (retentionGb == -1) {
-            topic.configs().put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionGb));
+            config.put(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(retentionGb));
         }
-        return new NewTopic(name, parseInt(name, numberPartitions), (short) parseInt(name, replicationFactor));
+        return topic.configs(config);
     }
 
     public static NewTopic create(String name, String numberPartitions, String replicationFactor) {
