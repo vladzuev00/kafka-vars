@@ -10,11 +10,11 @@ import java.util.Objects;
 @FieldNameConstants
 public class UnitSimpleTransportable {
     @Nullable
-    Long id;
+    String id;
     String deviceImei;
     boolean deleted;
 
-    public UnitSimpleTransportable(Long id, String deviceImei, boolean deleted) {
+    public UnitSimpleTransportable(String id, String deviceImei, boolean deleted) {
         this.id = id;
         this.deviceImei = deviceImei;
         this.deleted = deleted;
