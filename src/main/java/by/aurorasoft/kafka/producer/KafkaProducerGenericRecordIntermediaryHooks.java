@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class KafkaProducerGenericRecordIntermediaryHooks<TOPIC_KEY, TRANSPORTABLE, MODEL> extends KafkaProducerGenericRecordIntermediary<TOPIC_KEY, TRANSPORTABLE, MODEL> {
 
-    private final List<MODEL> failureMessages = Collections.synchronizedList(new ArrayList<>());
+    public final List<MODEL> failureMessages = Collections.synchronizedList(new ArrayList<>());
     public final ProducerMetrics metrics = new ProducerMetrics();
 
     public KafkaProducerGenericRecordIntermediaryHooks(String topicName, KafkaTemplate<TOPIC_KEY, GenericRecord> kafkaTemplate, Schema schema) {
