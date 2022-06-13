@@ -44,7 +44,7 @@ public abstract class KafkaProducerGenericRecordIntermediaryHooks<TOPIC_KEY, TRA
         metrics.sentCounterIncrement();
     }
 
-    private boolean isNotSendable(MODEL model) {
+    protected boolean isNotSendable(MODEL model) {
         return false;
     }
 
