@@ -23,6 +23,9 @@ public abstract class KafkaProducerGenericRecordIntermediaryHooks<TOPIC_KEY, TRA
     @Override
     public void send(MODEL model) {
         onBeforeSend();
+        if (isNotSendable(model)) {
+            return;
+        }
         sendModel(getTopicKey(model), model).addCallback(new ListenableFutureCallback<>() {
 
             @Override
@@ -39,6 +42,10 @@ public abstract class KafkaProducerGenericRecordIntermediaryHooks<TOPIC_KEY, TRA
             }
         });
         metrics.sentCounterIncrement();
+    }
+
+    private boolean isNotSendable(MODEL model) {
+        return false;
     }
 
     protected abstract TOPIC_KEY getTopicKey(MODEL model);
