@@ -12,6 +12,12 @@ public class ProducerMetrics {
     private final AtomicLong successCounter;
     private final AtomicLong failureCounter;
 
+    public ProducerMetrics(Long sentCounter, Long successCounter, Long failureCounter) {
+        this.sentCounter = new AtomicLong(sentCounter);
+        this.successCounter = new AtomicLong(successCounter);
+        this.failureCounter = new AtomicLong(failureCounter);
+    }
+
     public ProducerMetrics() {
         sentCounter = new AtomicLong(0);
         successCounter = new AtomicLong(0);
