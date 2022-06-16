@@ -1,16 +1,16 @@
 package by.aurorasoft.kafka.producer;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Value;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-@Getter
+@Value
 @AllArgsConstructor
 public class ProducerMetrics {
-    private final AtomicLong sentCounter;
-    private final AtomicLong successCounter;
-    private final AtomicLong failureCounter;
+    AtomicLong sentCounter;
+    AtomicLong successCounter;
+    AtomicLong failureCounter;
 
     public ProducerMetrics(Long sentCounter, Long successCounter, Long failureCounter) {
         this.sentCounter = new AtomicLong(sentCounter);
