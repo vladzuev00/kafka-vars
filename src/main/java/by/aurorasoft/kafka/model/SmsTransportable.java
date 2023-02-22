@@ -6,8 +6,7 @@ import lombok.experimental.FieldNameConstants;
 @Value
 @FieldNameConstants
 public class SmsTransportable {
-    long createdTimeSeconds;
-    int createdTimeNanos;
+    long createdTimeMillis;
     int lifeTimeSeconds;
     String phoneNumber;
     String text;
