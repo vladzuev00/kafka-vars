@@ -42,4 +42,7 @@ public interface KafkaVars {
 
     String SMS_MESSAGES_TOPIC_NAME = "sms-messages";
     String SMS_MESSAGES_GROUP_ID = "sms-messages";
+
+    String PERSONAL_TRACKER_PUSH_TOPIC_NAME = "personal-tracker-push";
+    String PERSONAL_TRACKER_PUSH_GROUP_ID = "personal-tracker-push";
 }
