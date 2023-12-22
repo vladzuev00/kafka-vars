@@ -45,4 +45,7 @@ public interface KafkaVars {
 
     String PERSONAL_TRACKER_PUSH_TOPIC_NAME = "personal-tracker-push";
     String PERSONAL_TRACKER_PUSH_GROUP_ID = "personal-tracker-push";
+
+    String FIX_ORDER_EVENT_TOPIC_NAME = "fix-order-event";
+    String FIX_ORDER_EVENT_GROUP_ID = "fix-order-event";
 }
