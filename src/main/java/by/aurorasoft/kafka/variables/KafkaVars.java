@@ -40,6 +40,9 @@ public interface KafkaVars {
     String MESSAGES_MAIN_TOPIC_NAME = "messages-main";
     String MESSAGES_MAIN_LOG_GROUP_ID = "messages-main";
 
+    String MESSAGES_SKO_TOPIC_NAME = "messages-sko";
+    String MESSAGES_SKO_LOG_GROUP_ID = "messages-sko";
+
     String SMS_MESSAGES_TOPIC_NAME = "sms-messages";
     String SMS_MESSAGES_GROUP_ID = "sms-messages";
 
