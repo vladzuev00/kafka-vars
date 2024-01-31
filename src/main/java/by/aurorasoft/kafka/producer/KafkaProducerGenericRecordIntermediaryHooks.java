@@ -27,21 +27,20 @@ public abstract class KafkaProducerGenericRecordIntermediaryHooks<TOPIC_KEY, TRA
             metrics.skipCounterIncrement();
             return;
         }
-        sendModel(getTopicKey(model), model).addCallback(new ListenableFutureCallback<>() {
-
-            @Override
-            public void onFailure(@Nullable Throwable throwable) {
-                failureMessages.add(model);
-                metrics.failureCounterIncrement();
-                onSendFailure(model, throwable);
-            }
-
-            @Override
-            public void onSuccess(@Nullable SendResult<TOPIC_KEY, GenericRecord> sendResult) {
-                metrics.successCounterIncrement();
-                onSendSuccess(sendResult);
-            }
-        });
+        sendModel(getTopicKey(model), model)
+                .handle((sendResult, throwable) -> {
+                    if (throwable != null) {
+                        // Обработка исключения
+                        failureMessages.add(model);
+                        metrics.failureCounterIncrement();
+                        onSendFailure(model, throwable);
+                    } else {
+                        // Обработка успешного результата
+                        metrics.successCounterIncrement();
+                        onSendSuccess(sendResult);
+                    }
+                    return null;
+                });
         metrics.sentCounterIncrement();
     }
 
