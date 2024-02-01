@@ -54,6 +54,12 @@
             <scope>provided</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.github.NikolayNN.crud-generic</groupId>
+            <artifactId>crud-abstract-generic</artifactId>
+            <version>10.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

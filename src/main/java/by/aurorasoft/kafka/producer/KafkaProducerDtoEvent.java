@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.producer;
 
-import by.aurorasoft.kafka.model.DtoTransportable;
+import by.aurorasoft.kafka.model.dtoevent.DtoTransportable;
 import by.aurorasoft.kafka.model.dtoevent.DtoEventTransportable;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;

@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.model.dtoevent;
 
-import by.aurorasoft.kafka.model.DtoTransportable;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.Accessors;
