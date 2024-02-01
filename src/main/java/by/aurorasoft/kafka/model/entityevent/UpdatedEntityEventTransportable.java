@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.model.entity.entityevent;
+package by.aurorasoft.kafka.model.entityevent;
 
 import by.aurorasoft.kafka.model.entity.EntityTransportable;
 

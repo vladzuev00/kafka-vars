@@ -1,7 +1,7 @@
 package by.aurorasoft.kafka.producer.entityevent;
 
 import by.aurorasoft.kafka.model.entity.EntityTransportable;
-import by.aurorasoft.kafka.model.entity.entityevent.EntityEventTransportable;
+import by.aurorasoft.kafka.model.entityevent.EntityEventTransportable;
 import by.aurorasoft.kafka.producer.KafkaProducerGenericRecordIntermediaryHooks;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
