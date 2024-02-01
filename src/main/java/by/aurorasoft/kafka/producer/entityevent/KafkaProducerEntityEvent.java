@@ -11,7 +11,7 @@ public abstract class KafkaProducerEntityEvent<
         ENTITY_ID,
         ENTITY extends EntityTransportable<ENTITY_ID>,
         TRANSPORTABLE,
-        EVENT extends EntityEventTransportable<ENTITY_ID, ENTITY>
+        EVENT extends EntityEventTransportable<ENTITY>
         >
         extends KafkaProducerGenericRecordIntermediaryHooks<ENTITY_ID, TRANSPORTABLE, EVENT> {
 
@@ -28,10 +28,9 @@ public abstract class KafkaProducerEntityEvent<
 
 
     @Override
-    protected TRANSPORTABLE convertModelToTransportable(final EVENT event) {
-        final ENTITY entity = event.getEntity();
-        return convertEntityToTransportable(entity);
+    protected final TRANSPORTABLE convertModelToTransportable(final EVENT event) {
+        return convertEntityToTransportable(event.getEntity());
     }
 
-    protected abstract TRANSPORTABLE convertEntityToTransportable(final ENTITY entity);
+    protected abstract TRANSPORTABLE convertEntityToTransportable(final ENTITY body);
 }

@@ -8,6 +8,6 @@ import lombok.experimental.Accessors;
 @RequiredArgsConstructor
 @Getter
 @Accessors(makeFinal = true)
-public abstract class EntityEventTransportable<ENTITY_ID, ENTITY extends EntityTransportable<ENTITY_ID>> {
+public abstract class EntityEventTransportable<ENTITY extends EntityTransportable<?>> {
     private final ENTITY entity;
 }

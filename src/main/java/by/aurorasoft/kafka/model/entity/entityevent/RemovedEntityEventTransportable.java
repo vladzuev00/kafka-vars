@@ -1,9 +1,12 @@
 package by.aurorasoft.kafka.model.entity.entityevent;
 
-public abstract class RemovedEntityEventTransportable<ID> extends EntityEventTransportable<ID> {
+import by.aurorasoft.kafka.model.entity.EntityTransportable;
 
-    public RemovedEntityEventTransportable(final ID id) {
-        super(id);
+public abstract class RemovedEntityEventTransportable<ENTITY extends EntityTransportable<?>>
+        extends EntityEventTransportable<ENTITY> {
+
+    public RemovedEntityEventTransportable(final ENTITY entity) {
+        super(entity);
     }
 
 }

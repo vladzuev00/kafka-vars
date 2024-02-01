@@ -1,5 +1,11 @@
 package by.aurorasoft.kafka.model.entity.entityevent;
 
-public abstract class NewEntityEventTransportable<ENTITY_ID> implements EntityEventTransportable<ENTITY_ID> {
-    private final ENTITY_ID
+import by.aurorasoft.kafka.model.entity.EntityTransportable;
+
+public abstract class NewEntityEventTransportable<ENTITY extends EntityTransportable<?>>
+        extends EntityEventTransportable<ENTITY> {
+
+    public NewEntityEventTransportable(final ENTITY entity) {
+        super(entity);
+    }
 }
