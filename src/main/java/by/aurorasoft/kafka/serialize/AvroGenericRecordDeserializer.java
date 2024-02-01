@@ -12,16 +12,17 @@ import org.apache.kafka.common.serialization.Deserializer;
 import java.util.Map;
 
 //https://medium.com/@mailshine/apache-avro-quick-example-in-kafka-7b2909396c02
-public class AvroGenericRecordDeserializer implements Deserializer {
-    private Schema schema = null;
+public class AvroGenericRecordDeserializer implements Deserializer<GenericRecord> {
+
+    protected Schema schema = null;
 
     @Override
-    public void configure(Map configs, boolean isKey) {
+    public void configure(Map<String, ?> configs, boolean isKey) {
         schema = (Schema) configs.get(KafkaVars.SCHEMA_PROP_NAME);
     }
 
     @Override
-    public Object deserialize(String topic, byte[] bytes) {
+    public GenericRecord deserialize(String topic, byte[] bytes) {
         GenericRecord result = null;
         try {
             if (bytes != null) {

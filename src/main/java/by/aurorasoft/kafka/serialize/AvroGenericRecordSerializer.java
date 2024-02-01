@@ -15,7 +15,7 @@ import java.util.Map;
 
 public class AvroGenericRecordSerializer implements Serializer<GenericRecord> {
 
-    private Schema schema = null;
+    protected Schema schema = null;
 
     @Override
     public void configure(Map<String, ?> map, boolean b) {
