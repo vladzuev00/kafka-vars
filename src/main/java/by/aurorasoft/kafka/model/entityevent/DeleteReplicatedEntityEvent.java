@@ -3,8 +3,10 @@ package by.aurorasoft.kafka.model.entityevent;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 @Getter
-public final class RemovedEntityEventTransportable<ID> implements EntityEventTransportable<ID> {
-    private final ID entityId;
+public final class DeleteReplicatedEntityEvent implements ReplicatedEntityEvent {
+    private final UUID entityId;
 }

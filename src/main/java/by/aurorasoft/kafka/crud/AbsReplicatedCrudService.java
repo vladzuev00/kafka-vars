@@ -1,40 +1,43 @@
 package by.aurorasoft.kafka.crud;
 
-import by.aurorasoft.kafka.model.entityevent.EntityEventTransportable;
-import by.aurorasoft.kafka.producer.KafkaProducerEntityEvent;
+import by.aurorasoft.kafka.model.entityevent.DeleteReplicatedEntityEvent;
+import by.aurorasoft.kafka.model.entityevent.ReplicatedEntityEvent;
+import by.aurorasoft.kafka.producer.entityevent.KafkaProducerDeletedEntityEvent;
+import by.aurorasoft.kafka.producer.entityevent.fixeddto.KafkaProducerNewEntityEvent;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.domain.AbstractEntity;
 import by.nhorushko.crudgeneric.v2.mapper.AbsMapperEntityDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
+import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.Collection;
 import java.util.List;
-
-import static by.aurorasoft.kafka.model.entityevent.EntityEventTransportable.EntityEventType.NEW;
-import static by.aurorasoft.kafka.model.entityevent.EntityEventTransportable.EntityEventType.UPDATED;
+import java.util.UUID;
 
 public abstract class AbsReplicatedCrudService<
-        ENTITY_ID,
-        ENTITY extends AbstractEntity<ENTITY_ID>,
-        DTO extends AbstractDto<ENTITY_ID>,
-        REPOSITORY extends JpaRepository<ENTITY, ENTITY_ID>,
-        TRANSPORTABLE
-        >
-        extends AbsServiceCRUD<ENTITY_ID, ENTITY, DTO, REPOSITORY> {
-    private final KafkaProducerEntityEvent<ENTITY_ID, DTO, TRANSPORTABLE> producerEntityEvent;
+        ENTITY extends AbstractEntity<UUID>,
+        DTO extends AbstractDto<UUID>,
+        REPOSITORY extends JpaRepository<ENTITY, UUID>,
+        TRANSPORTABLE_DTO>
+        extends AbsServiceCRUD<UUID, ENTITY, DTO, REPOSITORY> {
+    private final KafkaProducerDeletedEntityEvent<ENTITY_ID> producerDeletedEntityEvent;
+    private final KafkaProducerNewEntityEvent<ENTITY_ID, DTO, TRANSPORTABLE_DTO>
 
-    public AbsReplicatedCrudService(final AbsMapperEntityDto<ENTITY, DTO> mapper,
-                                    final REPOSITORY repository,
-                                    final KafkaProducerEntityEvent<ENTITY_ID, DTO, TRANSPORTABLE> producerEntityEvent) {
+    public AbsReplicatedCrudService(final AbsMapperEntityDto<ENTITY, DTO> mapper, final REPOSITORY repository,
+                                    final String topicName,
+                                    final KafkaTemplate<ENTITY_ID, GenericRecord> kafkaTemplate,
+                                    final Schema schema) {
         super(mapper, repository);
-        this.producerEntityEvent = producerEntityEvent;
+        producerDeletedEntityEvent = new KafkaProducerDeletedEntityEvent<>(topicName, kafkaTemplate, schema);
     }
 
     @Override
     public final DTO save(final DTO dto) {
         final DTO savedDto = super.save(dto);
-        final EntityEventTransportable<DTO> event = new EntityEventTransportable<>(savedDto, NEW);
+        final ReplicatedEntityEvent<DTO> event = new ReplicatedEntityEvent<>(savedDto, NEW);
         producerEntityEvent.send(event);
         return savedDto;
     }
@@ -43,7 +46,7 @@ public abstract class AbsReplicatedCrudService<
     public final List<DTO> saveAll(final Collection<DTO> dtos) {
         final List<DTO> savedDtos = super.saveAll(dtos);
         savedDtos.stream()
-                .map(savedDto -> new EntityEventTransportable<>(savedDto, NEW))
+                .map(savedDto -> new ReplicatedEntityEvent<>(savedDto, NEW))
                 .forEach(producerEntityEvent::send);
         return savedDtos;
     }
@@ -51,14 +54,15 @@ public abstract class AbsReplicatedCrudService<
     @Override
     public final DTO update(final DTO dto) {
         final DTO updatedDto = super.update(dto);
-        final EntityEventTransportable<DTO> event = new EntityEventTransportable<>(updatedDto, UPDATED);
+        final ReplicatedEntityEvent<DTO> event = new ReplicatedEntityEvent<>(updatedDto, UPDATED);
         producerEntityEvent.send(event);
         return updatedDto;
     }
 
     @Override
     public final void delete(final ENTITY_ID id) {
-        super.delete();
-        final DTO removedDto = repository.getOne()
+        super.delete(id);
+        final DeleteReplicatedEntityEvent event = new DeleteReplicatedEntityEvent(id);
+        producerDeletedEntityEvent.send(event);
     }
 }
