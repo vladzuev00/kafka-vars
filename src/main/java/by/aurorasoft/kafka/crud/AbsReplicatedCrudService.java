@@ -2,14 +2,11 @@ package by.aurorasoft.kafka.crud;
 
 import by.aurorasoft.kafka.model.entityevent.DeleteReplicatedEntityEvent;
 import by.aurorasoft.kafka.model.entityevent.ReplicatedEntityEvent;
-import by.aurorasoft.kafka.producer.entityevent.KafkaProducerDeletedEntityEvent;
-import by.aurorasoft.kafka.producer.entityevent.fixeddto.KafkaProducerNewEntityEvent;
+import by.aurorasoft.kafka.producer.entityevent.KafkaProducerDeleteReplicatedEntityEvent;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.domain.AbstractEntity;
 import by.nhorushko.crudgeneric.v2.mapper.AbsMapperEntityDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
-import org.apache.avro.Schema;
-import org.apache.avro.generic.GenericRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.kafka.core.KafkaTemplate;
 
@@ -23,15 +20,14 @@ public abstract class AbsReplicatedCrudService<
         REPOSITORY extends JpaRepository<ENTITY, UUID>,
         TRANSPORTABLE_DTO>
         extends AbsServiceCRUD<UUID, ENTITY, DTO, REPOSITORY> {
-    private final KafkaProducerDeletedEntityEvent<ENTITY_ID> producerDeletedEntityEvent;
-    private final KafkaProducerNewEntityEvent<ENTITY_ID, DTO, TRANSPORTABLE_DTO>
+    private final KafkaProducerDeleteReplicatedEntityEvent producerDeletedEntityEvent;
 
-    public AbsReplicatedCrudService(final AbsMapperEntityDto<ENTITY, DTO> mapper, final REPOSITORY repository,
+    public AbsReplicatedCrudService(final AbsMapperEntityDto<ENTITY, DTO> mapper,
+                                    final REPOSITORY repository,
                                     final String topicName,
-                                    final KafkaTemplate<ENTITY_ID, GenericRecord> kafkaTemplate,
-                                    final Schema schema) {
+                                    final KafkaTemplate<UUID, UUID> kafkaTemplate) {
         super(mapper, repository);
-        producerDeletedEntityEvent = new KafkaProducerDeletedEntityEvent<>(topicName, kafkaTemplate, schema);
+        producerDeletedEntityEvent = new KafkaProducerDeleteReplicatedEntityEvent(topicName, kafkaTemplate);
     }
 
     @Override
@@ -60,7 +56,7 @@ public abstract class AbsReplicatedCrudService<
     }
 
     @Override
-    public final void delete(final ENTITY_ID id) {
+    public final void delete(final UUID id) {
         super.delete(id);
         final DeleteReplicatedEntityEvent event = new DeleteReplicatedEntityEvent(id);
         producerDeletedEntityEvent.send(event);
