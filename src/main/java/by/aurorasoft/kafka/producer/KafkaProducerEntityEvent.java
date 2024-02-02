@@ -7,7 +7,7 @@ import org.apache.avro.generic.GenericRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
 public abstract class KafkaProducerEntityEvent<ID, DTO extends AbstractDto<ID>, TRANSPORTABLE>
-        extends KafkaProducerGenericRecordIntermediaryHooks<ID, TRANSPORTABLE, EntityEventTransportable<DTO>> {
+        extends KafkaProducerGenericRecordIntermediaryHooks<ID, TRANSPORTABLE, EntityEventTransportable<ID>> {
 
     public KafkaProducerEntityEvent(final String topicName,
                                     final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
@@ -16,13 +16,13 @@ public abstract class KafkaProducerEntityEvent<ID, DTO extends AbstractDto<ID>, 
     }
 
     @Override
-    protected final ID getTopicKey(final EntityEventTransportable<DTO> event) {
-        return event.getDto().getId();
+    protected final ID getTopicKey(final EntityEventTransportable<ID> event) {
+        return event.getEntityId();
     }
 
 
     @Override
-    protected final TRANSPORTABLE convertModelToTransportable(final EntityEventTransportable<DTO> event) {
+    protected final TRANSPORTABLE convertModelToTransportable(final EntityEventTransportable<ID> event) {
         return mapToTransportable(event.getDto());
     }
 
