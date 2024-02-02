@@ -8,17 +8,17 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 import java.util.UUID;
 
-public abstract class KafkaProducerEntityEvent<TRANSPORTABLE, EVENT extends ReplicatedEntityEvent<ID>>
+public abstract class KafkaProducerReplicatedEntityEvent<TRANSPORTABLE, EVENT extends ReplicatedEntityEvent>
         extends KafkaProducerGenericRecordIntermediaryHooks<UUID, TRANSPORTABLE, EVENT> {
 
-    public KafkaProducerEntityEvent(final String topicName,
-                                    final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
-                                    final Schema schema) {
+    public KafkaProducerReplicatedEntityEvent(final String topicName,
+                                              final KafkaTemplate<UUID, GenericRecord> kafkaTemplate,
+                                              final Schema schema) {
         super(topicName, kafkaTemplate, schema);
     }
 
     @Override
-    protected final ID getTopicKey(final EVENT event) {
+    protected final UUID getTopicKey(final EVENT event) {
         return event.getEntityId();
     }
 }

@@ -1,7 +1,7 @@
 package by.aurorasoft.kafka.producer.entityevent.fixeddto;
 
 import by.aurorasoft.kafka.model.entityevent.fixeddto.ReplicatedEntityEventFixingDto;
-import by.aurorasoft.kafka.producer.entityevent.KafkaProducerEntityEvent;
+import by.aurorasoft.kafka.producer.entityevent.KafkaProducerReplicatedEntityEvent;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -15,7 +15,7 @@ public abstract class KafkaProducerEntityEventFixedDto<
         TRANSPORTABLE_DTO,
         EVENT extends ReplicatedEntityEventFixingDto<ID, DTO>
         >
-        extends KafkaProducerEntityEvent<ID, TRANSPORTABLE_DTO, EVENT> {
+        extends KafkaProducerReplicatedEntityEvent<ID, TRANSPORTABLE_DTO, EVENT> {
 
     public KafkaProducerEntityEventFixedDto(final String topicName,
                                             final KafkaTemplate<ID, GenericRecord> kafkaTemplate,

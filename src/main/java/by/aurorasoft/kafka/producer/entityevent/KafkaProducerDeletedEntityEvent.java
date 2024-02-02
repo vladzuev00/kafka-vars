@@ -5,7 +5,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
-public final class KafkaProducerDeletedEntityEvent extends KafkaProducerEntityEvent<ID, ID, DeleteReplicatedEntityEvent<ID>> {
+public final class KafkaProducerDeletedEntityEvent extends KafkaProducerReplicatedEntityEvent<ID, ID, DeleteReplicatedEntityEvent<ID>> {
 
     public KafkaProducerDeletedEntityEvent(final String topicName,
                                            final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
