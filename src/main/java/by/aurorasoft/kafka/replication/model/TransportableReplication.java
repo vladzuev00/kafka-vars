@@ -11,7 +11,6 @@ import lombok.experimental.FieldNameConstants;
 @EqualsAndHashCode
 @ToString
 @FieldNameConstants
-public abstract class TransportableReplication<ENTITY_ID> {
+public abstract class TransportableReplication {
     private final ReplicationOperation operation;
-    private final ENTITY_ID entityId;
 }

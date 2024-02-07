@@ -6,3 +6,9 @@ CREATE TABLE persons
     name    VARCHAR(256) NOT NULL,
     surname VARCHAR(256) NOT NULL
 );
+
+CREATE TABLE person_replications(
+    id INTEGER PRIMARY KEY,
+    name VARCHAR(256) NOT NULL,
+    surname VARCHAR(256) NOT NULL
+);

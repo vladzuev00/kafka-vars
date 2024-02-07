@@ -1,7 +1,7 @@
 package by.aurorasoft.kafka.replication.aop;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
-import by.aurorasoft.kafka.replication.model.Replication;
+import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.ReplicationOperation;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
@@ -26,17 +26,17 @@ import static java.lang.String.format;
 public class ReplicationAspect {
     private final List<KafkaProducerReplication<?, ?>> producers;
 
-    @AfterReturning(pointcut = "replicatedServicePointcut() && replicatedSavePointcut()", returning = "savedDto")
+    @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto<?> savedDto) {
         replicate(joinPoint, savedDto, SAVE);
     }
 
-    @AfterReturning(value = "replicatedServicePointcut() && replicatedUpdatePointcut()", returning = "updatedDto")
+    @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto<?> updatedDto) {
         replicate(joinPoint, updatedDto, UPDATE);
     }
 
-    @AfterReturning("replicatedServicePointcut() && replicatedDeletePointcut()")
+    @AfterReturning("replicatedService() && replicatedDelete()")
     public void replicateDelete(final JoinPoint ignoredJoinPoint) {
         throw new NotImplementedException();
     }
@@ -62,23 +62,23 @@ public class ReplicationAspect {
                 .replicationProducer();
     }
 
-    @Pointcut("within(by.aurorasoft.kafka.replication.annotation.ReplicatedService)")
-    private void replicatedServicePointcut() {
+    @Pointcut("within(@by.aurorasoft.kafka.replication.annotation.ReplicatedService *)")
+    private void replicatedService() {
 
     }
 
     @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedSave)")
-    private void replicatedSavePointcut() {
+    private void replicatedSave() {
 
     }
 
     @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedUpdate)")
-    private void replicatedUpdatePointcut() {
+    private void replicatedUpdate() {
 
     }
 
     @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedDelete)")
-    private void replicatedDeletePointcut() {
+    private void replicatedDelete() {
 
     }
 

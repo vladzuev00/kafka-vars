@@ -1,7 +1,5 @@
 spring:
-  first-datasource:
-    url: jdbc:tc:postgresql:11.1:///integration-tests-db
-  second-datasource:
+  datasource:
     url: jdbc:tc:postgresql:11.1:///integration-tests-db
   jpa:
     hibernate:
@@ -14,3 +12,24 @@ spring:
           dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+  sql:
+    init:
+      mode: always
+  kafka:
+    bootstrap-servers: 127.0.0.1:9092
+
+kafka:
+  topic:
+    sync-person:
+      name: sync-person
+      partitions-amount: 1
+      replication-factor: 3
+      producer:
+        batch-size: 10
+        linger-ms: 500
+        delivery-timeout-ms: 100000
+      consumer:
+        group-id: sync-person-group
+        max-poll-records: 2
+        fetch-max-wait-ms: 1000
+        fetch-min-bytes: 10000
