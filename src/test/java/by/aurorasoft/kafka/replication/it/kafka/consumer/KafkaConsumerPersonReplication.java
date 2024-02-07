@@ -1,10 +1,8 @@
 package by.aurorasoft.kafka.replication.it.kafka.consumer;
 
 import by.aurorasoft.kafka.replication.consumer.KafkaConsumerReplication;
-import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.dto.PersonReplication;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonReplicationService;
-import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;

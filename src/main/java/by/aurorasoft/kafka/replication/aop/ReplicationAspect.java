@@ -1,8 +1,7 @@
 package by.aurorasoft.kafka.replication.aop;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
-import by.aurorasoft.kafka.replication.model.replication.Replication;
-import by.aurorasoft.kafka.replication.model.ReplicationOperation;
+import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationOperation.SAVE;
-import static by.aurorasoft.kafka.replication.model.ReplicationOperation.UPDATE;
 import static java.lang.String.format;
 
 @Aspect
@@ -28,12 +25,12 @@ public class ReplicationAspect {
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto<?> savedDto) {
-        replicate(joinPoint, savedDto, SAVE);
+        throw new UnsupportedOperationException();
     }
 
     @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto<?> updatedDto) {
-        replicate(joinPoint, updatedDto, UPDATE);
+        findProducer(joinPoint).send(new UpdateReplication(updatedDto));
     }
 
     @AfterReturning("replicatedService() && replicatedDelete()")
@@ -41,13 +38,8 @@ public class ReplicationAspect {
         throw new NotImplementedException();
     }
 
-    private void replicate(final JoinPoint joinPoint, final AbstractDto<?> dto, final ReplicationOperation operation) {
-        final Class<? extends KafkaProducerReplication<?, ?>> producerType = findProducerType(joinPoint);
-        final Replication replication = new Replication(operation, dto);
-        findProducer(producerType).send(replication);
-    }
-
-    private KafkaProducerReplication<?, ?> findProducer(final Class<? extends KafkaProducerReplication<?, ?>> type) {
+    private KafkaProducerReplication<?, ?> findProducer(final JoinPoint joinPoint) {
+        final Class<? extends KafkaProducerReplication<?, ?>> type = findProducerType(joinPoint);
         return producers.stream()
                 .filter(producer -> producer.getClass() == type)
                 .findAny()

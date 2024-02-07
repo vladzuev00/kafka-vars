@@ -1,13 +1,15 @@
 package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.producer.KafkaProducerGenericRecordIntermediaryHooks;
-import by.aurorasoft.kafka.replication.model.replication.Replication;
-import by.aurorasoft.kafka.replication.model.ReplicationOperation;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
+import by.aurorasoft.kafka.replication.model.replication.Replication;
+import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.kafka.core.KafkaTemplate;
+
+import static by.aurorasoft.kafka.replication.model.ReplicationOperation.UPDATE;
 
 public abstract class KafkaProducerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ENTITY_ID, TransportableReplication, Replication<ENTITY_ID, DTO>> {
@@ -19,15 +21,17 @@ public abstract class KafkaProducerReplication<ENTITY_ID, DTO extends AbstractDt
     }
 
     @Override
-    protected final ENTITY_ID getTopicKey(final Replication<ENTITY_ID, DTO> event) {
-        return event.getDto().getId();
+    protected final ENTITY_ID getTopicKey(final Replication<ENTITY_ID, DTO> replication) {
+        return replication.getEntityId();
     }
 
     @Override
-    protected final TransportableReplication convertModelToTransportable(final Replication<ENTITY_ID, DTO> event) {
-        return createTransportableEvent(event.getOperation(), event.getDto());
+    protected final TransportableReplication convertModelToTransportable(final Replication<ENTITY_ID, DTO> replication) {
+        if (replication instanceof UpdateReplication) {
+            final UpdateReplication<ENTITY_ID, DTO> updateReplication = (UpdateReplication<ENTITY_ID, DTO>) replication;
+
+        }
     }
 
-    protected abstract TransportableReplication createTransportableEvent(final ReplicationOperation type,
-                                                                                    final DTO dto);
+
 }
