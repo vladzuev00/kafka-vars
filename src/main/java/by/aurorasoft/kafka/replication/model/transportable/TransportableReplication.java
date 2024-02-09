@@ -1,5 +1,6 @@
-package by.aurorasoft.kafka.replication.model;
+package by.aurorasoft.kafka.replication.model.transportable;
 
+import by.aurorasoft.kafka.replication.model.ReplicationOperation;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import lombok.AllArgsConstructor;
@@ -15,7 +16,7 @@ import static lombok.AccessLevel.PRIVATE;
 @AllArgsConstructor(access = PRIVATE)
 @Builder(access = PRIVATE)
 @FieldNameConstants
-public final class Replication {
+public final class TransportableReplication {
     private final ReplicationOperation operation;
 
     @Nullable
@@ -24,30 +25,26 @@ public final class Replication {
     @Nullable
     private final TransportableDto dto;
 
-    public Object getEntityId() {
-        return dto != null ? dto.getId() : entityId;
-    }
-
     public <ID, DTO extends AbstractDto<ID>> void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service) {
         operation.execute(this, service);
     }
 
-    public static Replication createSaveReplication(final TransportableDto dto) {
-        return Replication.builder()
+    public static TransportableReplication createTransportableSave(final TransportableDto dto) {
+        return TransportableReplication.builder()
                 .operation(SAVE)
                 .dto(dto)
                 .build();
     }
 
-    public static Replication createUpdateReplication(final TransportableDto dto) {
-        return Replication.builder()
+    public static TransportableReplication createTransportableUpdate(final TransportableDto dto) {
+        return TransportableReplication.builder()
                 .operation(UPDATE)
                 .dto(dto)
                 .build();
     }
 
-    public static Replication createDeleteReplication(final Object entityId) {
-        return Replication.builder()
+    public static TransportableReplication createTransportableDelete(final Object entityId) {
+        return TransportableReplication.builder()
                 .operation(DELETE)
                 .entityId(entityId)
                 .build();

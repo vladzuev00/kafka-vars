@@ -1,11 +1,16 @@
 package by.aurorasoft.kafka.replication.aop;
 
-import by.aurorasoft.kafka.replication.replicator.ServiceReplicator;
+import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
+import by.aurorasoft.kafka.replication.model.replication.DeleteReplication;
+import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
+import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
+import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -17,47 +22,59 @@ import static java.util.stream.Collectors.toMap;
 @Aspect
 @Component
 public class ReplicationAspect {
-    private final Map<Class<?>, ServiceReplicator> replicatorsByServiceTypes;
+    private final Map<Class<?>, KafkaProducerReplication<?, ?>> producersByTypes;
 
-    public ReplicationAspect(final List<ServiceReplicator> replicators) {
-        replicatorsByServiceTypes = createReplicatorsByServiceTypes(replicators);
+    public ReplicationAspect(final List<KafkaProducerReplication<?, ?>> producers) {
+        producersByTypes = createProducersByTypes(producers);
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto<?> savedDto) {
-        findReplicator(joinPoint).replicateSave(savedDto);
+        findProducer(joinPoint).send(new SaveReplication(savedDto));
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSaveAll()", returning = "savedDtos")
     public void replicateSaveAll(final JoinPoint joinPoint, final List<AbstractDto<?>> savedDtos) {
-        findReplicator(joinPoint).replicateSaveAll(savedDtos);
+        savedDtos.forEach(dto -> replicateSave(joinPoint, dto));
     }
 
     @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto<?> updatedDto) {
-        findReplicator(joinPoint).replicateUpdate(updatedDto);
+        findProducer(joinPoint).send(new UpdateReplication(updatedDto));
     }
 
     @AfterReturning("replicatedService() && replicatedDelete()")
     public void replicateDelete(final JoinPoint joinPoint) {
         final Object entityId = joinPoint.getArgs()[0];
-        findReplicator(joinPoint).replicateDelete(entityId);
+        findProducer(joinPoint).send(new DeleteReplication(entityId));
     }
 
-    private static Map<Class<?>, ServiceReplicator> createReplicatorsByServiceTypes(
-            final List<ServiceReplicator> replicators
+    private static Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByTypes(
+            final List<KafkaProducerReplication<?, ?>> producers
     ) {
-        return replicators.stream()
+        return producers.stream()
                 .collect(
                         toMap(
-                                ServiceReplicator::getReplicatedService,
+                                KafkaProducerReplication::getClass,
                                 identity()
                         )
                 );
     }
 
-    private ServiceReplicator findReplicator(final JoinPoint joinPoint) {
-        return replicatorsByServiceTypes.get(joinPoint.getTarget().getClass());
+    private KafkaProducerReplication<?, ?> findProducer(final JoinPoint joinPoint) {
+        final Class<?> producerType = findProducerType(joinPoint);
+        return producersByTypes.computeIfAbsent(producerType, this::throwNoProducerException);
+    }
+
+    private static Class<?> findProducerType(final JoinPoint joinPoint) {
+        return ((MethodSignature) joinPoint.getSignature())
+                .getMethod()
+                .getAnnotation(ReplicatedService.class)
+                .replicationProducer();
+    }
+
+    private KafkaProducerReplication<?, ?> throwNoProducerException(final Class<?> producerType) {
+        throw new NoReplicationProducerException("There is no replication producer for type %s".formatted(producerType));
     }
 
     @Pointcut("within(@by.aurorasoft.kafka.replication.annotation.ReplicatedService *)")
@@ -83,5 +100,27 @@ public class ReplicationAspect {
     @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedDelete)")
     private void replicatedDelete() {
 
+    }
+
+    static final class NoReplicationProducerException extends RuntimeException {
+
+        @SuppressWarnings("unused")
+        public NoReplicationProducerException() {
+
+        }
+
+        public NoReplicationProducerException(final String description) {
+            super(description);
+        }
+
+        @SuppressWarnings("unused")
+        public NoReplicationProducerException(final Exception cause) {
+            super(cause);
+        }
+
+        @SuppressWarnings("unused")
+        public NoReplicationProducerException(final String description, final Exception cause) {
+            super(description, cause);
+        }
     }
 }

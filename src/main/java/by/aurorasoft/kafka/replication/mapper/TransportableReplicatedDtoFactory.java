@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.replication.mapper;
 
-import by.aurorasoft.kafka.replication.model.TransportableDto;
+import by.aurorasoft.kafka.replication.model.transportable.TransportableDto;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import lombok.RequiredArgsConstructor;
 
