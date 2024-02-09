@@ -7,6 +7,7 @@ import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonReplicationService;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
+import org.apache.avro.reflect.ReflectData;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -33,6 +34,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
 
     @Test
     public void personShouldBeSavedWithReplication() {
+
         final Person givenPerson = Person.builder()
                 .id(256L)
                 .name("Vlad")

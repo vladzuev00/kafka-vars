@@ -8,6 +8,7 @@ import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
 import by.aurorasoft.kafka.replication.it.kafka.producer.KafkaProducerPersonReplication;
+import by.aurorasoft.kafka.replication.mapper.TransportableReplicatedDtoFactory;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import org.springframework.stereotype.Service;
 
