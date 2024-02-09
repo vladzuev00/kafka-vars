@@ -1,11 +1,10 @@
 package by.aurorasoft.kafka.replication.model.replication;
 
-import by.aurorasoft.kafka.replication.model.transportable.TransportableDto;
-import by.aurorasoft.kafka.replication.model.transportable.TransportableReplication;
+import by.aurorasoft.kafka.replication.model.ReplicationProducingContext;
+import by.aurorasoft.kafka.replication.model.TransportableDto;
+import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import lombok.RequiredArgsConstructor;
-
-import java.util.function.Function;
 
 @RequiredArgsConstructor
 public abstract class ReplicationWithDto implements Replication {
@@ -18,11 +17,11 @@ public abstract class ReplicationWithDto implements Replication {
 
     @Override
     @SuppressWarnings("unchecked")
-    public final <DTO extends AbstractDto<?>> TransportableReplication mapToTransportable(final Function<DTO, TransportableDto> dtoMapper) {
+    public final <DTO extends AbstractDto<?>> TransportableReplication mapToTransportable(final ReplicationProducingContext<DTO> context) {
         final DTO dto = (DTO) this.dto;
-        final TransportableDto transportableDto = dtoMapper.apply(dto);
-        return createTransportable(transportableDto);
+        final TransportableDto transportableDto = context.getDtoToTransportableMapper().apply(dto);
+        return createTransportableReplication(transportableDto);
     }
 
-    protected abstract TransportableReplication createTransportable(final TransportableDto dto);
+    protected abstract TransportableReplication createTransportableReplication(final TransportableDto dto);
 }

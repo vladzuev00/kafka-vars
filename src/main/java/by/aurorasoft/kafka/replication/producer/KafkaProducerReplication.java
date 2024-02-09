@@ -1,9 +1,10 @@
 package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.producer.KafkaProducerGenericRecordIntermediaryHooks;
+import by.aurorasoft.kafka.replication.model.ReplicationProducingContext;
+import by.aurorasoft.kafka.replication.model.TransportableDto;
+import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
-import by.aurorasoft.kafka.replication.model.transportable.TransportableDto;
-import by.aurorasoft.kafka.replication.model.transportable.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
@@ -12,14 +13,16 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public abstract class KafkaProducerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ENTITY_ID, TransportableReplication, Replication> {
+    private final ReplicationProducingContext<?> producingContext;
 
     public KafkaProducerReplication(final String topicName, final KafkaTemplate<ENTITY_ID, GenericRecord> kafkaTemplate) {
         super(topicName, kafkaTemplate, getTransportableReplicationSchema());
+        producingContext = new ReplicationProducingContext<>(this::mapToTransportableDto);
     }
 
     @Override
     protected final TransportableReplication convertModelToTransportable(final Replication replication) {
-        return replication.mapToTransportable(this::mapToTransportableDto);
+        return replication.mapToTransportable(producingContext);
     }
 
     @Override

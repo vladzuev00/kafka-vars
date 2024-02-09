@@ -1,10 +1,10 @@
 package by.aurorasoft.kafka.replication.model.replication;
 
-import by.aurorasoft.kafka.replication.model.transportable.TransportableDto;
-import by.aurorasoft.kafka.replication.model.transportable.TransportableReplication;
+import by.aurorasoft.kafka.replication.model.TransportableDto;
+import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 
-import static by.aurorasoft.kafka.replication.model.transportable.TransportableReplication.createTransportableSave;
+import static by.aurorasoft.kafka.replication.model.ReplicationType.SAVE;
 
 public final class SaveReplication extends ReplicationWithDto {
 
@@ -13,7 +13,10 @@ public final class SaveReplication extends ReplicationWithDto {
     }
 
     @Override
-    protected TransportableReplication createTransportable(final TransportableDto dto) {
-        return createTransportableSave(dto);
+    protected TransportableReplication createTransportableReplication(final TransportableDto dto) {
+        return TransportableReplication.builder()
+                .type(SAVE)
+                .dto(dto)
+                .build();
     }
 }

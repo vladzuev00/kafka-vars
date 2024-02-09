@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.replication.it.model;
 
-import by.aurorasoft.kafka.replication.model.transportable.TransportableReplication;
+import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
