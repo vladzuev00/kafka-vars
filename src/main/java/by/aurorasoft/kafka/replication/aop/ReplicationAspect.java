@@ -43,10 +43,9 @@ public class ReplicationAspect {
         this.<ID, DTO>findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
     }
 
-    @SuppressWarnings("unchecked")
     @AfterReturning("replicatedService() && replicatedDelete()")
     public <ID, DTO extends AbstractDto<ID>> void replicateDelete(final JoinPoint joinPoint) {
-        final ID entityId = (ID) joinPoint.getArgs()[0];
+        @SuppressWarnings("unchecked") final ID entityId = (ID) joinPoint.getArgs()[0];
         this.<ID, DTO>findProducer(joinPoint).send(new DeleteReplication<>(entityId));
     }
 

@@ -13,9 +13,9 @@ import static by.aurorasoft.kafka.replication.model.ReplicationType.valueOf;
 import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.entityId;
 
 @RequiredArgsConstructor
-public abstract class KafkaConsumerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_ID>>
-        extends KafkaConsumerGenericRecord<ENTITY_ID, Replication> {
-    private final AbsServiceCRUD<ENTITY_ID, ?, DTO, ?> service;
+public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
+        extends KafkaConsumerGenericRecord<ID, Replication> {
+    private final AbsServiceCRUD<ID, ?, DTO, ?> service;
 
 
 //    @Override
@@ -51,12 +51,12 @@ public abstract class KafkaConsumerReplication<ENTITY_ID, DTO extends AbstractDt
 //    }
 
     @SuppressWarnings("unchecked")
-    private ENTITY_ID getEntityId(final GenericRecord record) {
-        return (ENTITY_ID) record.get(entityId);
+    private ID getEntityId(final GenericRecord record) {
+        return (ID) record.get(entityId);
     }
 
     @Override
-    public void listen(final ConsumerRecord<ENTITY_ID, GenericRecord> record) {
+    public void listen(final ConsumerRecord<ID, GenericRecord> record) {
 
     }
 
