@@ -28,20 +28,19 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
 
     @Override
     protected final TransportableReplication convertModelToTransportable(final Replication<ID, DTO> replication) {
-        if (replication instanceof final SaveReplication saveReplication) {
-            return createSaveReplication(objectMapper.writeValueAsString(mapToJsonView((DTO) saveReplication.getDto())));
-        } else if (replication instanceof final UpdateReplication updateReplication) {
-            return createUpdateReplication(objectMapper.writeValueAsString(mapToJsonView((DTO) updateReplication.getDto())));
-        } else if(replication instanceof final DeleteReplication deleteReplication) {
+        if (replication instanceof final SaveReplication<ID, DTO> saveReplication) {
+            return createSaveReplication(objectMapper.writeValueAsString(mapToJsonView(saveReplication.getDto())));
+        } else if (replication instanceof final UpdateReplication<ID, DTO> updateReplication) {
+            return createUpdateReplication(objectMapper.writeValueAsString(mapToJsonView(updateReplication.getDto())));
+        } else if(replication instanceof final DeleteReplication<ID, DTO> deleteReplication) {
             return createDeleteReplication(deleteReplication.getEntityId());
         }
         throw new UnsupportedOperationException("Replicate replication is unsupported: '%s'".formatted(replication));
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    protected final ID getTopicKey(final Replication replication) {
-        return (ID) replication.getEntityId();
+    protected final ID getTopicKey(final Replication<ID, DTO> replication) {
+        return replication.getEntityId();
     }
 
     protected abstract Object mapToJsonView(final DTO dto);
