@@ -29,24 +29,24 @@ public class ReplicationAspect {
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
-    public void replicateSave(final JoinPoint joinPoint, final AbstractDto<?> savedDto) {
-        findProducer(joinPoint).send(new SaveReplication(savedDto));
+    public <ID, DTO extends AbstractDto<ID>> void replicateSave(final JoinPoint joinPoint, final DTO savedDto) {
+        this.<ID, DTO>findProducer(joinPoint).send(new SaveReplication<>(savedDto));
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSaveAll()", returning = "savedDtos")
-    public void replicateSaveAll(final JoinPoint joinPoint, final List<AbstractDto<?>> savedDtos) {
+    public <ID, DTO extends AbstractDto<ID>> void replicateSaveAll(final JoinPoint joinPoint, final List<DTO> savedDtos) {
         savedDtos.forEach(dto -> replicateSave(joinPoint, dto));
     }
 
     @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
-    public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto<?> updatedDto) {
-        findProducer(joinPoint).send(new UpdateReplication(updatedDto));
+    public <ID, DTO extends AbstractDto<ID>> void replicateUpdate(final JoinPoint joinPoint, final DTO updatedDto) {
+        this.<ID, DTO>findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
     }
 
     @AfterReturning("replicatedService() && replicatedDelete()")
     public void replicateDelete(final JoinPoint joinPoint) {
         final Object entityId = joinPoint.getArgs()[0];
-        findProducer(joinPoint).send(new DeleteReplication(entityId));
+        findProducer(joinPoint).send(new DeleteReplication<>(entityId));
     }
 
     private static Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByTypes(
@@ -61,9 +61,13 @@ public class ReplicationAspect {
                 );
     }
 
-    private KafkaProducerReplication<?, ?> findProducer(final JoinPoint joinPoint) {
+    @SuppressWarnings("unchecked")
+    private <ID, DTO extends AbstractDto<ID>> KafkaProducerReplication<ID, DTO> findProducer(final JoinPoint joinPoint) {
         final Class<?> producerType = findProducerType(joinPoint);
-        return producersByTypes.computeIfAbsent(producerType, this::throwNoProducerException);
+        return (KafkaProducerReplication<ID, DTO>) producersByTypes.computeIfAbsent(
+                producerType,
+                this::throwNoProducerException
+        );
     }
 
     private static Class<?> findProducerType(final JoinPoint joinPoint) {

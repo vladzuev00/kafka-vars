@@ -3,20 +3,21 @@ package by.aurorasoft.kafka.replication.it;
 import by.aurorasoft.kafka.base.AbstractSpringBootTest;
 import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.dto.PersonReplication;
-import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
+import by.aurorasoft.kafka.replication.it.crud.entity.PersonReplicationEntity;
+import by.aurorasoft.kafka.replication.it.crud.mapper.PersonReplicationMapper;
+import by.aurorasoft.kafka.replication.it.crud.repository.PersonReplicationRepository;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonReplicationService;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
-import org.apache.avro.reflect.ReflectData;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.lang.System.out;
 import static java.lang.Thread.currentThread;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
@@ -32,18 +33,34 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Autowired
     private PersonReplicationService replicationService;
 
-    @Test
-    public void personShouldBeSavedWithReplication() {
+    @Autowired
+    private PersonReplicationRepository replicationRepository;
 
-        final Person givenPerson = Person.builder()
+    @Autowired
+    private PersonReplicationMapper replicationMapper;
+
+    @Test
+//    @Transactional(propagation = NOT_SUPPORTED)
+    public void personShouldBeSavedWithReplication() {
+        final PersonReplication givenReplication = PersonReplication.builder()
                 .id(256L)
                 .name("Vlad")
                 .surname("Zuev")
                 .build();
+        final PersonReplicationEntity givenEntity = replicationMapper.toEntity(givenReplication);
 
-        personService.save(givenPerson);
+        final PersonReplicationEntity savedEntity = replicationRepository.save(givenEntity);
+        out.println("Saved entity: " + savedEntity);
+
+
+//        final PersonReplicationEntity givenReplication = PersonReplicationEntity.builder()
+//                .id(256L)
+//                .name("Vlad")
+//                .surname("Zuev")
+//                .build();
 //
-//        TimeUnit.SECONDS.sleep(10);
+//        replicationRepository.save(givenReplication);
+//        entityManager.flush();
     }
 
     @Test

@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.replication.it.kafka.configuration;
 
-import by.aurorasoft.kafka.replication.it.model.TransportablePersonReplication;
+import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import org.apache.avro.Schema;
 import org.apache.avro.reflect.ReflectData;
 import org.springframework.context.annotation.Bean;
@@ -16,6 +16,6 @@ public class SchemaConfiguration {
 
     @Bean
     public Schema transportablePersonReplicationSchema(final ReflectData reflectData) {
-        return reflectData.getSchema(TransportablePersonReplication.class);
+        return reflectData.getSchema(TransportableReplication.class);
     }
 }

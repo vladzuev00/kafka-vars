@@ -2,31 +2,21 @@ package by.aurorasoft.kafka.replication.consumer;
 
 import by.aurorasoft.kafka.consumer.KafkaConsumerGenericRecord;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
-import by.aurorasoft.kafka.replication.model.ReplicationType;
+import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.*;
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.createTransportableDelete;
-import static by.aurorasoft.kafka.replication.model.ReplicationType.*;
+import static by.aurorasoft.kafka.replication.model.ReplicationType.valueOf;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.entityId;
 
 @RequiredArgsConstructor
-public class KafkaConsumerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_ID>>
-        extends KafkaConsumerGenericRecord<ENTITY_ID, Transpor> {
+public abstract class KafkaConsumerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_ID>>
+        extends KafkaConsumerGenericRecord<ENTITY_ID, Replication> {
     private final AbsServiceCRUD<ENTITY_ID, ?, DTO, ?> service;
 
-    @Override
-    public void listen(ConsumerRecord<ENTITY_ID, GenericRecord> record) {
-
-    }
-
-    @Override
-    protected TransportableReplication map(GenericRecord record) {
-        return null;
-    }
 
 //    @Override
 //    public void listen(final ConsumerRecord<ENTITY_ID, GenericRecord> record) {
@@ -47,21 +37,36 @@ public class KafkaConsumerReplication<ENTITY_ID, DTO extends AbstractDto<ENTITY_
 //        throw new RuntimeException();
 //    }
 
-    protected abstract TRANSPORTABLE_DTO getTransportableDto(final GenericRecord record);
-
-    protected abstract DTO mapToDto(final TRANSPORTABLE_DTO transportableDto);
-
-    private ReplicationType getReplicationOperation(final GenericRecord record) {
-        return valueOf(getString(record, type));
-    }
-
-    private TransportableReplication extractDeleteReplication(final GenericRecord record) {
-        final ENTITY_ID entityId = getEntityId(record);
-        return createTransportableDelete(entityId);
-    }
+//    protected abstract TRANSPORTABLE_DTO getTransportableDto(final GenericRecord record);
+//
+//    protected abstract DTO mapToDto(final TRANSPORTABLE_DTO transportableDto);
+//
+//    private ReplicationType getReplicationOperation(final GenericRecord record) {
+//        return valueOf(getString(record, type));
+//    }
+//
+//    private TransportableReplication extractDeleteReplication(final GenericRecord record) {
+//        final ENTITY_ID entityId = getEntityId(record);
+//        return createTransportableDelete(entityId);
+//    }
 
     @SuppressWarnings("unchecked")
     private ENTITY_ID getEntityId(final GenericRecord record) {
         return (ENTITY_ID) record.get(entityId);
+    }
+
+    @Override
+    public void listen(final ConsumerRecord<ENTITY_ID, GenericRecord> record) {
+
+    }
+
+    @Override
+    protected Replication map(final GenericRecord record) {
+
+        return null;
+    }
+
+    private TransportableReplication mapToTransportableReplication() {
+        return null;
     }
 }

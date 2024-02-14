@@ -1,22 +1,16 @@
 package by.aurorasoft.kafka.replication.model.replication;
 
-import by.aurorasoft.kafka.replication.model.TransportableDto;
-import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
+import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.UPDATE;
+public final class UpdateReplication<ID, DTO extends AbstractDto<ID>> extends ReplicationWithDto<ID, DTO> {
 
-public final class UpdateReplication extends ReplicationWithDto {
-
-    public UpdateReplication(final AbstractDto<?> dto) {
+    public UpdateReplication(final DTO dto) {
         super(dto);
     }
 
     @Override
-    protected TransportableReplication createTransportableReplication(final TransportableDto dto) {
-        return TransportableReplication.builder()
-                .type(UPDATE)
-                .dto(dto)
-                .build();
+    protected void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service, final DTO dto) {
+        service.update(dto);
     }
 }

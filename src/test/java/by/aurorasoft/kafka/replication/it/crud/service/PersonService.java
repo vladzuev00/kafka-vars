@@ -7,13 +7,11 @@ import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
-import by.aurorasoft.kafka.replication.it.kafka.producer.KafkaProducerPersonReplication;
-import by.aurorasoft.kafka.replication.mapper.TransportableReplicatedDtoFactory;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import org.springframework.stereotype.Service;
 
 @Service
-@ReplicatedService(replicationProducer = KafkaProducerPersonReplication.class)
+//@ReplicatedService(replicationProducer = KafkaProducerPersonReplication.class)
 public class PersonService extends AbsServiceCRUD<Long, PersonEntity, Person, PersonRepository> {
 
     public PersonService(final PersonMapper mapper, final PersonRepository repository) {

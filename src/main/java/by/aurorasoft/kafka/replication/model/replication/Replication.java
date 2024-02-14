@@ -1,10 +1,9 @@
 package by.aurorasoft.kafka.replication.model.replication;
 
-import by.aurorasoft.kafka.replication.model.ReplicationProducingContext;
-import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
+import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 
-public interface Replication {
-    Object getEntityId();
-    <DTO extends AbstractDto<?>> TransportableReplication mapToTransportable(final ReplicationProducingContext<DTO> context);
+public interface Replication<ID, DTO extends AbstractDto<ID>> {
+    ID getEntityId();
+    void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service);
 }
