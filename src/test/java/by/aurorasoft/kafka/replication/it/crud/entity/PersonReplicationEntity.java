@@ -1,9 +1,10 @@
 package by.aurorasoft.kafka.replication.it.crud.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
-
-import static jakarta.persistence.GenerationType.IDENTITY;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +17,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 public class PersonReplicationEntity extends AbstractEntity<Long> {
 
     @Id
-//    @GeneratedValue(strategy = IDENTITY)
     @Column(name = "id")
     private Long id;
 

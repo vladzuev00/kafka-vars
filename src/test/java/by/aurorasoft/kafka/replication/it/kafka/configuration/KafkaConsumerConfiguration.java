@@ -34,7 +34,7 @@ public class KafkaConsumerConfiguration {
             @Value("${kafka.topic.sync-person.consumer.max-poll-records}") final int maxPollRecords,
             @Value("${kafka.topic.sync-person.consumer.fetch-max-wait-ms}") final int fetchMaxWaitMs,
             @Value("${kafka.topic.sync-person.consumer.fetch-min-bytes}") final int fetchMinBytes,
-            @Qualifier("transportablePersonReplicationSchema") final Schema schema
+            @Qualifier("transportableReplicationSchema") final Schema schema
     ) {
         return createConsumerFactory(groupId, maxPollRecords, fetchMaxWaitMs, fetchMinBytes, schema);
     }

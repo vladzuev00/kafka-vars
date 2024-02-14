@@ -7,7 +7,6 @@ import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
-import org.apache.avro.reflect.ReflectData;
 import org.springframework.kafka.core.KafkaTemplate;
 
 public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
@@ -16,8 +15,9 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
 
     public KafkaProducerReplication(final String topicName,
                                     final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
+                                    final Schema schema,
                                     final ObjectMapper objectMapper) {
-        super(topicName, kafkaTemplate, getTransportableReplicationSchema());
+        super(topicName, kafkaTemplate, schema);
         this.context = new ReplicationProducingContext<>(this::mapToJsonView, objectMapper);
     }
 
@@ -32,8 +32,4 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
     }
 
     protected abstract Object mapToJsonView(final DTO dto);
-
-    private static Schema getTransportableReplicationSchema() {
-        return ReflectData.get().getSchema(TransportableReplication.class);
-    }
 }

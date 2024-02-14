@@ -25,4 +25,7 @@ public class PersonEntity extends AbstractEntity<Long> {
 
     @Column(name = "surname")
     private String surname;
+
+    @Column(name = "patronymic")
+    private String patronymic;
 }

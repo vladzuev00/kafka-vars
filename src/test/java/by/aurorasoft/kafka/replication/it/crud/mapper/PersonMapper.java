@@ -16,6 +16,6 @@ public final class PersonMapper extends AbsMapperEntityDto<PersonEntity, Person>
 
     @Override
     protected Person create(final PersonEntity entity) {
-        return new Person(entity.getId(), entity.getName(), entity.getSurname());
+        return new Person(entity.getId(), entity.getName(), entity.getSurname(), entity.getPatronymic());
     }
 }

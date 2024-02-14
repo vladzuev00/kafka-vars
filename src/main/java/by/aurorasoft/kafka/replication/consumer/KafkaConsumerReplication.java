@@ -1,72 +1,48 @@
 package by.aurorasoft.kafka.replication.consumer;
 
-import by.aurorasoft.kafka.consumer.KafkaConsumerGenericRecord;
+import by.aurorasoft.kafka.consumer.KafkaConsumerGenericRecordBatch;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
-import lombok.RequiredArgsConstructor;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.valueOf;
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.entityId;
+import java.util.List;
 
-@RequiredArgsConstructor
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.*;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.valueOf;
+
 public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
-        extends KafkaConsumerGenericRecord<ID, Replication> {
+        extends KafkaConsumerGenericRecordBatch<ID, Replication<ID, DTO>> {
     private final AbsServiceCRUD<ID, ?, DTO, ?> service;
+    private final ReplicationConsumingContext<ID, DTO> context;
 
-
-//    @Override
-//    public void listen(final ConsumerRecord<ENTITY_ID, GenericRecord> record) {
-//        final TransportableReplication replication = map(record);
-//        replication.execute(service);
-//    }
-//
-//    @Override
-//    protected final TransportableReplication map(final GenericRecord record) {
-//        final ReplicationOperation operation = getReplicationOperation(record);
-//        if (operation == SAVE || operation == UPDATE) {
-//            return TransportableReplication.createTransportableSave(getTransportableDto(getObject(record, dto)));
-//        } else if (operation == UPDATE) {
-//            return TransportableReplication.createTransportableUpdate(getTransportableDto(getObject(record, dto)));
-//        } else if (operation == DELETE) {
-//            return extractDeleteReplication(record);
-//        }
-//        throw new RuntimeException();
-//    }
-
-//    protected abstract TRANSPORTABLE_DTO getTransportableDto(final GenericRecord record);
-//
-//    protected abstract DTO mapToDto(final TRANSPORTABLE_DTO transportableDto);
-//
-//    private ReplicationType getReplicationOperation(final GenericRecord record) {
-//        return valueOf(getString(record, type));
-//    }
-//
-//    private TransportableReplication extractDeleteReplication(final GenericRecord record) {
-//        final ENTITY_ID entityId = getEntityId(record);
-//        return createTransportableDelete(entityId);
-//    }
-
-    @SuppressWarnings("unchecked")
-    private ID getEntityId(final GenericRecord record) {
-        return (ID) record.get(entityId);
+    public KafkaConsumerReplication(final AbsServiceCRUD<ID, ?, DTO, ?> service,
+                                    final ObjectMapper objectMapper,
+                                    final Class<DTO> dtoType) {
+        this.service = service;
+        context = new ReplicationConsumingContext<>(objectMapper, dtoType);
     }
 
     @Override
-    public void listen(final ConsumerRecord<ID, GenericRecord> record) {
-
+    public void listen(final List<ConsumerRecord<ID, GenericRecord>> records) {
+        records.stream()
+                .map(this::map)
+                .forEach(replication -> replication.execute(service));
     }
 
     @Override
-    protected Replication map(final GenericRecord record) {
-
-        return null;
+    protected final Replication<ID, DTO> map(final GenericRecord record) {
+        return createTransportableReplication(record).createReplication(context);
     }
 
-    private TransportableReplication mapToTransportableReplication() {
-        return null;
+    private TransportableReplication createTransportableReplication(final GenericRecord record) {
+        return new TransportableReplication(
+                valueOf(getString(record, type)),
+                getObject(record, entityId),
+                getString(record, dtoJsonView)
+        );
     }
 }

@@ -4,7 +4,7 @@ import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.UPDATE;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.UPDATE;
 
 public final class UpdateReplication<ID, DTO extends AbstractDto<ID>> extends ReplicationWithDto<ID, DTO> {
 

@@ -13,12 +13,14 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
+//TODO: опробывать оставить с generic-ами
 @Aspect
 @Component
 public class ReplicationAspect {
@@ -39,8 +41,8 @@ public class ReplicationAspect {
     }
 
     @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
-    public <ID, DTO extends AbstractDto<ID>> void replicateUpdate(final JoinPoint joinPoint, final DTO updatedDto) {
-        this.<ID, DTO>findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
+    public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
+        findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
     }
 
     @AfterReturning("replicatedService() && replicatedDelete()")
@@ -71,8 +73,8 @@ public class ReplicationAspect {
     }
 
     private static Class<?> findProducerType(final JoinPoint joinPoint) {
-        return ((MethodSignature) joinPoint.getSignature())
-                .getMethod()
+        return joinPoint.getTarget()
+                .getClass()
                 .getAnnotation(ReplicatedService.class)
                 .replicationProducer();
     }

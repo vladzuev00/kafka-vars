@@ -10,12 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class SchemaConfiguration {
 
     @Bean
-    public ReflectData reflectData() {
-        return ReflectData.get();
-    }
-
-    @Bean
-    public Schema transportablePersonReplicationSchema(final ReflectData reflectData) {
-        return reflectData.getSchema(TransportableReplication.class);
+    public Schema transportableReplicationSchema() {
+        return ReflectData.get().getSchema(TransportableReplication.class);
     }
 }

@@ -12,4 +12,5 @@ public class Person implements AbstractDto<Long> {
     Long id;
     String name;
     String surname;
+    String patronymic;
 }

@@ -29,7 +29,7 @@ public class KafkaProducerConfiguration {
             @Value("${kafka.topic.sync-person.producer.batch-size}") final int batchSize,
             @Value("${kafka.topic.sync-person.producer.linger-ms}") final int lingerMs,
             @Value("${kafka.topic.sync-person.producer.delivery-timeout-ms}") final int deliveryTimeoutMs,
-            @Qualifier("transportablePersonReplicationSchema") final Schema schema
+            @Qualifier("transportableReplicationSchema") final Schema schema
     ) {
         return createKafkaTemplate(batchSize, lingerMs, deliveryTimeoutMs, schema);
     }

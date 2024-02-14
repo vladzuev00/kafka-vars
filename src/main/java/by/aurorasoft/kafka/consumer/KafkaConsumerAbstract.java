@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.consumer;
 
-import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 public abstract class KafkaConsumerAbstract<TOPIC_KEY, TOPIC_VALUE> {

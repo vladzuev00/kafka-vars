@@ -7,7 +7,7 @@ import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.DELETE;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.DELETE;
 
 @RequiredArgsConstructor
 public final class DeleteReplication<ID, DTO extends AbstractDto<ID>> implements Replication<ID, DTO> {

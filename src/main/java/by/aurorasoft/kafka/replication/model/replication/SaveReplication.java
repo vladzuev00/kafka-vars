@@ -4,7 +4,7 @@ import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.SAVE;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.SAVE;
 
 public final class SaveReplication<ID, DTO extends AbstractDto<ID>> extends ReplicationWithDto<ID, DTO> {
 
