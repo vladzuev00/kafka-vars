@@ -10,32 +10,32 @@ public final class ReplicationConsumingContext<ID, DTO extends AbstractDto<ID>> 
     private final ObjectMapper objectMapper;
     private final Class<DTO> dtoType;
 
-    public DTO deserializeDto(final String view) {
+    public DTO deserializeDto(final String json) {
         try {
-            return objectMapper.readValue(view, dtoType);
+            return objectMapper.readValue(json, dtoType);
         } catch (final JsonProcessingException cause) {
-            throw new ReplicationConsumingException(cause);
+            throw new DtoJsonDeserializationException(cause);
         }
     }
 
-    static final class ReplicationConsumingException extends RuntimeException {
+    static final class DtoJsonDeserializationException extends RuntimeException {
 
         @SuppressWarnings("unused")
-        public ReplicationConsumingException() {
+        public DtoJsonDeserializationException() {
 
         }
 
         @SuppressWarnings("unused")
-        public ReplicationConsumingException(final String description) {
+        public DtoJsonDeserializationException(final String description) {
             super(description);
         }
 
-        public ReplicationConsumingException(final Exception cause) {
+        public DtoJsonDeserializationException(final Exception cause) {
             super(cause);
         }
 
         @SuppressWarnings("unused")
-        public ReplicationConsumingException(final String description, final Exception cause) {
+        public DtoJsonDeserializationException(final String description, final Exception cause) {
             super(description, cause);
         }
     }
