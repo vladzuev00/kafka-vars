@@ -9,36 +9,36 @@ import java.util.function.Function;
 
 @RequiredArgsConstructor
 public final class ReplicationProducingContext<ID, DTO extends AbstractDto<ID>> {
-    private final Function<DTO, Object> dtoToJsonViewMapper;
+    private final Function<DTO, Object> dtoProjector;
     private final ObjectMapper objectMapper;
 
-    public String mapToJsonView(final DTO dto) {
+    public String projectDtoAsJson(final DTO dto) {
         try {
-            final Object jsonView = dtoToJsonViewMapper.apply(dto);
-            return objectMapper.writeValueAsString(jsonView);
+            final Object project = dtoProjector.apply(dto);
+            return objectMapper.writeValueAsString(project);
         } catch (final JsonProcessingException cause) {
-            throw new ReplicationProducingException(cause);
+            throw new DtoProjectionException(cause);
         }
     }
 
-    private static final class ReplicationProducingException extends RuntimeException {
+    static final class DtoProjectionException extends RuntimeException {
 
         @SuppressWarnings("unused")
-        public ReplicationProducingException() {
+        public DtoProjectionException() {
 
         }
 
         @SuppressWarnings("unused")
-        public ReplicationProducingException(final String description) {
+        public DtoProjectionException(final String description) {
             super(description);
         }
 
-        public ReplicationProducingException(final Exception cause) {
+        public DtoProjectionException(final Exception cause) {
             super(cause);
         }
 
         @SuppressWarnings("unused")
-        public ReplicationProducingException(final String description, final Exception cause) {
+        public DtoProjectionException(final String description, final Exception cause) {
             super(description, cause);
         }
     }

@@ -22,7 +22,7 @@ public final class KafkaProducerPersonReplication extends KafkaProducerReplicati
     }
 
     @Override
-    protected Object mapToJsonView(final Person dto) {
+    protected Object projectDto(final Person dto) {
         return new PersonJsonView(dto.getId(), dto.getName(), dto.getSurname(), dto.getPatronymic());
     }
 
