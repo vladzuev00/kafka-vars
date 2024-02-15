@@ -36,6 +36,7 @@ public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
 
     @Override
     protected final Replication<ID, DTO> map(final GenericRecord record) {
+        final DTO dto = dtoDeserializer.
         return createTransportableReplication(record).createReplication(dtoDeserializer);
     }
 
