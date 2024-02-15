@@ -4,6 +4,8 @@ import org.apache.avro.generic.GenericRecord;
 
 import java.time.Instant;
 
+import static java.lang.Enum.valueOf;
+
 public interface GenericRecordConverter {
     default long getLong(GenericRecord record, String name) {
         return (long) record.get(name);
@@ -39,5 +41,10 @@ public interface GenericRecordConverter {
 
     default <T> T getObject(GenericRecord record, String name) {
         return (T) record.get(name);
+    }
+
+    //TODO: test
+    default <E extends Enum<E>> E getEnumObject(final GenericRecord record, final String name, final Class<E> enumType) {
+        return valueOf(enumType, getString(record, name));
     }
 }

@@ -2,6 +2,7 @@ package by.aurorasoft.kafka.replication.consumer;
 
 import by.aurorasoft.kafka.consumer.KafkaConsumerGenericRecordBatch;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
+import by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
@@ -11,8 +12,8 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.List;
 
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.*;
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.valueOf;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.dtoJson;
+import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.type;
 
 public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaConsumerGenericRecordBatch<ID, Replication<ID, DTO>> {
@@ -40,7 +41,7 @@ public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
 
     private TransportableReplication createTransportableReplication(final GenericRecord record) {
         return new TransportableReplication(
-                valueOf(getString(record, type)),
+                getEnumObject(record, type, ReplicationType.class),
                 getString(record, dtoJson)
         );
     }
