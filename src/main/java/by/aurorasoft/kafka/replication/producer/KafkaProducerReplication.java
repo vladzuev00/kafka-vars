@@ -18,7 +18,7 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
                                     final Schema schema,
                                     final ObjectMapper objectMapper) {
         super(topicName, kafkaTemplate, schema);
-        context = new ReplicationProducingContext<>(this::projectDto, objectMapper);
+        context = new ReplicationProducingContext<>(objectMapper);
     }
 
     @Override
@@ -30,6 +30,4 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
     protected final TransportableReplication convertModelToTransportable(final Replication<ID, DTO> replication) {
         return replication.createTransportable(context);
     }
-
-    protected abstract Object projectDto(final DTO dto);
 }

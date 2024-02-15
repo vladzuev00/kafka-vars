@@ -17,8 +17,8 @@ public abstract class Replication<ID, DTO extends AbstractDto<ID>> {
 
     public final TransportableReplication createTransportable(final ReplicationProducingContext<ID, DTO> context) {
         final ReplicationType type = getType();
-        final String dtoJsonView = context.projectDtoAsJson(dto);
-        return new TransportableReplication(type, dtoJsonView);
+        final String projectDtoAsJson = context.projectDtoAsJson(dto);
+        return new TransportableReplication(type, projectDtoAsJson);
     }
 
     public final void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service) {

@@ -15,7 +15,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public final class TransportableReplication {
     private final ReplicationType type;
-    private final String dtoJsonView;
+    private final String dtoProjectAsJson;
 
     public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final ReplicationConsumingContext<ID, DTO> context) {
         return type.createReplication(this, context);
@@ -26,7 +26,7 @@ public final class TransportableReplication {
             @Override
             public <ID, DTO extends AbstractDto<ID>> SaveReplication<ID, DTO> createReplication(final TransportableReplication replication,
                                                                                                 final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoJsonView);
+                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
                 return new SaveReplication<>(dto);
             }
         },
@@ -35,7 +35,7 @@ public final class TransportableReplication {
             @Override
             public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
                                                                                             final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoJsonView);
+                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
                 return new UpdateReplication<>(dto);
             }
         },
@@ -44,7 +44,7 @@ public final class TransportableReplication {
             @Override
             public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
                                                                                             final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoJsonView);
+                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
                 return new DeleteReplication<>(dto);
             }
         };
