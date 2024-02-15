@@ -2,7 +2,7 @@ package by.aurorasoft.kafka.replication.model.replication;
 
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType;
-import by.aurorasoft.kafka.replication.producer.ReplicationProducingContext;
+import by.aurorasoft.kafka.replication.producer.ReplicatedDtoSerializer;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,9 @@ public abstract class Replication<ID, DTO extends AbstractDto<ID>> {
         return dto.getId();
     }
 
-    public final TransportableReplication createTransportable(final ReplicationProducingContext<ID, DTO> context) {
+    public final TransportableReplication createTransportable(final ReplicatedDtoSerializer<ID, DTO> serializer) {
         final ReplicationType type = getType();
-        final String dtoJson = context.serializeToJson(dto);
+        final String dtoJson = serializer.serialize(dto);
         return new TransportableReplication(type, dtoJson);
     }
 

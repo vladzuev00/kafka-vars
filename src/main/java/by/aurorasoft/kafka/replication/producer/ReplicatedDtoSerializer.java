@@ -6,35 +6,35 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class ReplicationProducingContext<ID, DTO extends AbstractDto<ID>> {
+public final class ReplicatedDtoSerializer<ID, DTO extends AbstractDto<ID>> {
     private final ObjectMapper objectMapper;
 
-    public String serializeToJson(final DTO dto) {
+    public String serialize(final DTO dto) {
         try {
             return objectMapper.writeValueAsString(dto);
         } catch (final JsonProcessingException cause) {
-            throw new DtoJsonSerializationException(cause);
+            throw new ReplicatedDtoSerializationException(cause);
         }
     }
 
-    static final class DtoJsonSerializationException extends RuntimeException {
+    static final class ReplicatedDtoSerializationException extends RuntimeException {
 
         @SuppressWarnings("unused")
-        public DtoJsonSerializationException() {
+        public ReplicatedDtoSerializationException() {
 
         }
 
         @SuppressWarnings("unused")
-        public DtoJsonSerializationException(final String description) {
+        public ReplicatedDtoSerializationException(final String description) {
             super(description);
         }
 
-        public DtoJsonSerializationException(final Exception cause) {
+        public ReplicatedDtoSerializationException(final Exception cause) {
             super(cause);
         }
 
         @SuppressWarnings("unused")
-        public DtoJsonSerializationException(final String description, final Exception cause) {
+        public ReplicatedDtoSerializationException(final String description, final Exception cause) {
             super(description, cause);
         }
     }

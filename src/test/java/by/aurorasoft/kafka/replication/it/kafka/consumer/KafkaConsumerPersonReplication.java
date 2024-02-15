@@ -10,13 +10,22 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.Phaser;
+import java.util.concurrent.TimeoutException;
+
+import static java.lang.Thread.currentThread;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 @Component
 public final class KafkaConsumerPersonReplication extends KafkaConsumerReplication<Long, ReplicatedPerson> {
+    private static final int WAIT_CONSUMING_SECONDS = 5;
+
+    private final Phaser phaser;
 
     public KafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, ReplicatedPerson, ?> service,
                                           final ObjectMapper objectMapper) {
         super(service, objectMapper, ReplicatedPerson.class);
+        phaser = new Phaser(2);
     }
 
     @Override
@@ -27,6 +36,19 @@ public final class KafkaConsumerPersonReplication extends KafkaConsumerReplicati
     )
     public void listen(final List<ConsumerRecord<Long, GenericRecord>> records) {
         super.listen(records);
+        phaser.arrive();
     }
 
+    public boolean isSuccessConsuming() {
+        try {
+            final int phaseNumber = phaser.arrive();
+            phaser.awaitAdvanceInterruptibly(phaseNumber, WAIT_CONSUMING_SECONDS, SECONDS);
+            return true;
+        } catch (final InterruptedException exception) {
+            currentThread().interrupt();
+            return false;
+        } catch (final TimeoutException exception) {
+            return false;
+        }
+    }
 }

@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public final class ReplicationConsumingContext<ID, DTO extends AbstractDto<ID>> {
+public final class ReplicatedDtoDeserializer<DTO extends AbstractDto<?>> {
     private final ObjectMapper objectMapper;
     private final Class<DTO> dtoType;
 
@@ -14,28 +14,28 @@ public final class ReplicationConsumingContext<ID, DTO extends AbstractDto<ID>> 
         try {
             return objectMapper.readValue(json, dtoType);
         } catch (final JsonProcessingException cause) {
-            throw new DtoJsonDeserializationException(cause);
+            throw new ReplicatedDtoDeserializationException(cause);
         }
     }
 
-    static final class DtoJsonDeserializationException extends RuntimeException {
+    static final class ReplicatedDtoDeserializationException extends RuntimeException {
 
         @SuppressWarnings("unused")
-        public DtoJsonDeserializationException() {
+        public ReplicatedDtoDeserializationException() {
 
         }
 
         @SuppressWarnings("unused")
-        public DtoJsonDeserializationException(final String description) {
+        public ReplicatedDtoDeserializationException(final String description) {
             super(description);
         }
 
-        public DtoJsonDeserializationException(final Exception cause) {
+        public ReplicatedDtoDeserializationException(final Exception cause) {
             super(cause);
         }
 
         @SuppressWarnings("unused")
-        public DtoJsonDeserializationException(final String description, final Exception cause) {
+        public ReplicatedDtoDeserializationException(final String description, final Exception cause) {
             super(description, cause);
         }
     }

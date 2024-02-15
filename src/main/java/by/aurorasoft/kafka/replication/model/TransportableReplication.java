@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.replication.model;
 
-import by.aurorasoft.kafka.replication.consumer.ReplicationConsumingContext;
+import by.aurorasoft.kafka.replication.consumer.ReplicatedDtoDeserializer;
 import by.aurorasoft.kafka.replication.model.replication.DeleteReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
@@ -17,7 +17,7 @@ public final class TransportableReplication {
     private final ReplicationType type;
     private final String dtoJson;
 
-    public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final ReplicationConsumingContext<ID, DTO> context) {
+    public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final ReplicatedDtoDeserializer<DTO> context) {
         return type.createReplication(this, context);
     }
 
@@ -44,7 +44,7 @@ public final class TransportableReplication {
         };
 
         public final <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
-                                                                                              final ReplicationConsumingContext<ID, DTO> context) {
+                                                                                              final ReplicatedDtoDeserializer<DTO> context) {
             final DTO dto = context.deserializeDto(replication.dtoJson);
             return createReplication(dto);
         }

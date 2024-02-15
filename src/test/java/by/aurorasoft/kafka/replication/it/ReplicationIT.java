@@ -3,12 +3,9 @@ package by.aurorasoft.kafka.replication.it;
 import by.aurorasoft.kafka.base.kafka.AbstractKafkaContainerTest;
 import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.dto.ReplicatedPerson;
-import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
-import by.aurorasoft.kafka.replication.it.crud.mapper.ReplicatedPersonMapper;
-import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
-import by.aurorasoft.kafka.replication.it.crud.repository.ReplicatedPersonRepository;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
 import by.aurorasoft.kafka.replication.it.crud.service.ReplicatedPersonService;
+import by.aurorasoft.kafka.replication.it.kafka.consumer.KafkaConsumerPersonReplication;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
@@ -16,66 +13,72 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 
-import static java.lang.Thread.currentThread;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
 public class ReplicationIT extends AbstractKafkaContainerTest {
-    private static final int WAIT_REPLICATION_SECONDS = 5;
 
     @Autowired
     private PersonService personService;
 
     @Autowired
-    private PersonRepository personRepository;
-
-    @Autowired
     private ReplicatedPersonService replicatedPersonService;
 
     @Autowired
-    private ReplicatedPersonRepository replicationRepository;
-
-    @Autowired
-    private ReplicatedPersonMapper replicationMapper;
-
-    @Autowired
-    private PersonMapper mapper;
+    private KafkaConsumerPersonReplication replicationConsumer;
 
     @Test
-//    @Transactional(propagation = NOT_SUPPORTED)
-    @Sql(statements = "DELETE FROM persons", executionPhase = AFTER_TEST_METHOD)
-    @Sql(statements = "DELETE FROM person_replications", executionPhase = AFTER_TEST_METHOD)
-    public void personShouldBeSavedWithReplication() {
+    @Transactional(propagation = NOT_SUPPORTED)
+    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    public void personAndReplicatedPersonShouldBeSaved() {
+        final String givenName = "Vlad";
+        final String givenSurname = "Zuev";
+        final String givenPatronymic = "Sergeevich";
+        final LocalDate givenBirthDate = LocalDate.of(2000, 2, 18);
         final Person givenPerson = Person.builder()
-                .name("Vlad")
-                .surname("Zuev")
-                .patronymic("Sergeevich")
+                .name(givenName)
+                .surname(givenSurname)
+                .patronymic(givenPatronymic)
+                .birthDate(givenBirthDate)
                 .build();
 
-        personService.save(givenPerson);
+        final Person actualSavedPerson = personService.save(givenPerson);
 
-        waitReplication();
+        final Long expectedSavedPersonId = 1L;
+        final Person expectedSavedPerson = Person.builder()
+                .id(expectedSavedPersonId)
+                .name(givenName)
+                .surname(givenSurname)
+                .patronymic(givenPatronymic)
+                .birthDate(givenBirthDate)
+                .build();
+        assertEquals(expectedSavedPerson, actualSavedPerson);
 
-//        final PersonReplicationEntity givenReplication = PersonReplicationEntity.builder()
-//                .id(256L)
-//                .name("Vlad")
-//                .surname("Zuev")
-//                .build();
-//
-//        PersonReplicationEntity savedEntity = replicationRepository.save(givenReplication);
-//        entityManager.flush();
+        assertTrue(replicationConsumer.isSuccessConsuming());
+
+        final ReplicatedPerson actualReplicatedPerson = replicatedPersonService.getById(expectedSavedPersonId);
+        final ReplicatedPerson expectedReplicatedPerson = ReplicatedPerson.builder()
+                .id(expectedSavedPersonId)
+                .name(givenName)
+                .surname(givenSurname)
+                .birthDate(givenBirthDate)
+                .build();
+        assertEquals(expectedReplicatedPerson, actualReplicatedPerson);
+    }
+
+    @Test
+    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    public void personsAndReplicatedPersonsShouldBeSaved() {
+
     }
 
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
-    @Sql(statements = "INSERT INTO persons(id, name, surname, patronymic, birth_date) VALUES(255, 'Vlad', 'Zuev', 'Sergeevich', '2000-02-18')")
-    @Sql(statements = "INSERT INTO replicated_persons(id, name, surname, birth_date) VALUES(255, 'Vlad', 'Zuev', '2000-02-18')")
-    @Sql(statements = "DELETE FROM persons", executionPhase = AFTER_TEST_METHOD)
-    @Sql(statements = "DELETE FROM replicated_persons", executionPhase = AFTER_TEST_METHOD)
-    public void replicatedPersonShouldBeUpdated() {
+    @Sql("classpath:sql-scripts/replication/it/insert-person.sql")
+    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    public void personAndReplicatedPersonShouldBeUpdated() {
         final Long givenId = 255L;
         final String givenNewName = "Ivan";
         final String givenNewSurname = "Ivanov";
@@ -92,36 +95,30 @@ public class ReplicationIT extends AbstractKafkaContainerTest {
         final Person actualUpdatedPerson = personService.update(givenNewPerson);
         assertEquals(givenNewPerson, actualUpdatedPerson);
 
-        waitReplication();
+        assertTrue(replicationConsumer.isSuccessConsuming());
 
-        final ReplicatedPerson actualReplication = replicatedPersonService.getById(givenId);
-        final ReplicatedPerson expectedReplication = ReplicatedPerson.builder()
+        final ReplicatedPerson actualUpdatedReplication = replicatedPersonService.getById(givenId);
+        final ReplicatedPerson expectedUpdatedReplication = ReplicatedPerson.builder()
                 .id(givenId)
                 .name(givenNewName)
                 .surname(givenNewSurname)
                 .birthDate(givenNewBirthDate)
                 .build();
-        assertEquals(expectedReplication, actualReplication);
+        assertEquals(expectedUpdatedReplication, actualUpdatedReplication);
     }
 
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
-    @Sql(statements = "INSERT INTO persons(id, name, surname, patronymic, birth_date) VALUES(255, 'Vlad', 'Zuev', 'Sergeevich', '2000-02-18')")
-    @Sql(statements = "INSERT INTO replicated_persons(id, name, surname, birth_date) VALUES(255, 'Vlad', 'Zuev', '2000-02-18')")
-    public void replicatedPersonShouldBeDeleted() {
+    @Sql("classpath:sql-scripts/replication/it/insert-person.sql")
+    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    public void personAndReplicatedPersonShouldBeDeleted() {
         final Long givenId = 255L;
 
         personService.delete(givenId);
-        waitReplication();
-        final boolean successDeleting = !personService.isExist(givenId) && !replicatedPersonService.isExist(givenId);
-        assertFalse(successDeleting);
-    }
 
-    private static void waitReplication() {
-        try {
-            SECONDS.sleep(WAIT_REPLICATION_SECONDS);
-        } catch (final InterruptedException exception) {
-            currentThread().interrupt();
-        }
+        assertTrue(replicationConsumer.isSuccessConsuming());
+
+        final boolean successDeleting = !personService.isExist(givenId) && !replicatedPersonService.isExist(givenId);
+        assertTrue(successDeleting);
     }
 }

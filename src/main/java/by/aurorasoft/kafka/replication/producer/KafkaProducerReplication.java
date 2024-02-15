@@ -11,14 +11,14 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ID, TransportableReplication, Replication<ID, DTO>> {
-    private final ReplicationProducingContext<ID, DTO> context;
+    private final ReplicatedDtoSerializer<ID, DTO> dtoSerializer;
 
     public KafkaProducerReplication(final String topicName,
                                     final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
                                     final Schema schema,
                                     final ObjectMapper objectMapper) {
         super(topicName, kafkaTemplate, schema);
-        context = new ReplicationProducingContext<>(objectMapper);
+        dtoSerializer = new ReplicatedDtoSerializer<>(objectMapper);
     }
 
     @Override
@@ -28,6 +28,6 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
 
     @Override
     protected final TransportableReplication convertModelToTransportable(final Replication<ID, DTO> replication) {
-        return replication.createTransportable(context);
+        return replication.createTransportable(dtoSerializer);
     }
 }

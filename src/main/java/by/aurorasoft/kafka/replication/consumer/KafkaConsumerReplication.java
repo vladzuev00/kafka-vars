@@ -18,13 +18,13 @@ import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fie
 public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaConsumerGenericRecordBatch<ID, Replication<ID, DTO>> {
     private final AbsServiceCRUD<ID, ?, DTO, ?> service;
-    private final ReplicationConsumingContext<ID, DTO> context;
+    private final ReplicatedDtoDeserializer<DTO> context;
 
     public KafkaConsumerReplication(final AbsServiceCRUD<ID, ?, DTO, ?> service,
                                     final ObjectMapper objectMapper,
                                     final Class<DTO> dtoType) {
         this.service = service;
-        context = new ReplicationConsumingContext<>(objectMapper, dtoType);
+        context = new ReplicatedDtoDeserializer<>(objectMapper, dtoType);
     }
 
     @Override
