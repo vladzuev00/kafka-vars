@@ -5,9 +5,11 @@ import by.aurorasoft.kafka.replication.model.TransportableReplication.Replicatio
 import by.aurorasoft.kafka.replication.producer.ReplicatedDtoSerializer;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
+import lombok.EqualsAndHashCode;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
+@EqualsAndHashCode
 public abstract class Replication<ID, DTO extends AbstractDto<ID>> {
     private final DTO dto;
 

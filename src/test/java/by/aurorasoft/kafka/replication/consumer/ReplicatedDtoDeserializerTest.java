@@ -12,17 +12,17 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public final class ReplicatedDtoDeserializerTest {
-    private final ReplicatedDtoDeserializer<Person> personDeserializer = new ReplicatedDtoDeserializer<>(
+    private final ReplicatedDtoDeserializer<TestPerson> personDeserializer = new ReplicatedDtoDeserializer<>(
             new ObjectMapper(),
-            Person.class
+            TestPerson.class
     );
 
     @Test
     public void dtoShouldBeDeserialized() {
         final String givenJson = "{\"id\":255,\"name\":\"Vlad\",\"surname\":\"Zuev\",\"patronymic\":\"Sergeevich\"}";
 
-        final Person actual = personDeserializer.deserializeDto(givenJson);
-        final Person expected = Person.builder()
+        final TestPerson actual = personDeserializer.deserializeDto(givenJson);
+        final TestPerson expected = TestPerson.builder()
                 .id(255L)
                 .name("Vlad")
                 .surname("Zuev")
@@ -39,7 +39,7 @@ public final class ReplicatedDtoDeserializerTest {
     }
 
     @Value
-    private static class Person implements AbstractDto<Long> {
+    private static class TestPerson implements AbstractDto<Long> {
         Long id;
         String name;
         String surname;
@@ -47,10 +47,10 @@ public final class ReplicatedDtoDeserializerTest {
 
         @Builder
         @JsonCreator
-        public Person(@JsonProperty("id") final Long id,
-                      @JsonProperty("name") final String name,
-                      @JsonProperty("surname") final String surname,
-                      @JsonProperty("patronymic") final String patronymic) {
+        public TestPerson(@JsonProperty("id") final Long id,
+                          @JsonProperty("name") final String name,
+                          @JsonProperty("surname") final String surname,
+                          @JsonProperty("patronymic") final String patronymic) {
             this.id = id;
             this.name = name;
             this.surname = surname;
