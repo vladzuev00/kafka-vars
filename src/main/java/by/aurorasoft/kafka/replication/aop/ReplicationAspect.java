@@ -6,21 +6,23 @@ import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
 import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
+import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-//TODO: опробывать оставить с generic-ами
+//TODO: попробывать оставить с generic-ами
 @Aspect
 @Component
 public class ReplicationAspect {
@@ -31,8 +33,8 @@ public class ReplicationAspect {
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
-    public <ID, DTO extends AbstractDto<ID>> void replicateSave(final JoinPoint joinPoint, final DTO savedDto) {
-        this.<ID, DTO>findProducer(joinPoint).send(new SaveReplication<>(savedDto));
+    public void replicateSave(final JoinPoint joinPoint, final AbstractDto savedDto) {
+        findProducer(joinPoint).send(new SaveReplication(savedDto));
     }
 
     @AfterReturning(pointcut = "replicatedService() && replicatedSaveAll()", returning = "savedDtos")
@@ -42,13 +44,18 @@ public class ReplicationAspect {
 
     @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
-        findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
+        findProducer(joinPoint).send(new UpdateReplication(updatedDto));
     }
 
-    @AfterReturning("replicatedService() && replicatedDelete()")
-    public <ID, DTO extends AbstractDto<ID>> void replicateDelete(final JoinPoint joinPoint) {
-        @SuppressWarnings("unchecked") final ID entityId = (ID) joinPoint.getArgs()[0];
-        this.<ID, DTO>findProducer(joinPoint).send(new DeleteReplication<>(entityId));
+    @SuppressWarnings("unchecked")
+    @Around("replicatedService() && replicatedDelete()")
+    public <ID, DTO extends AbstractDto<ID>> Object replicateDelete(final ProceedingJoinPoint joinPoint) throws Throwable {
+        final AbsServiceCRUD<ID, ?, DTO, ?> service = (AbsServiceCRUD<ID, ?, DTO, ?>) joinPoint.getTarget();
+        final ID entityId = (ID) joinPoint.getArgs()[0];
+        final DTO dto = service.getById(entityId);
+        final Object result = joinPoint.proceed();
+        this.<ID, DTO>findProducer(joinPoint).send(new DeleteReplication<>(dto));
+        return result;
     }
 
     private static Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByTypes(

@@ -1,9 +1,6 @@
 package by.aurorasoft.kafka.replication.it.crud.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @NoArgsConstructor
@@ -25,4 +22,7 @@ public class PersonReplicationEntity extends AbstractEntity<Long> {
 
     @Column(name = "surname")
     private String surname;
+
+    @Version
+    private Long version;
 }

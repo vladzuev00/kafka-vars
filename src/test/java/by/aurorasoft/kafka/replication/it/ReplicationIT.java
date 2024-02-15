@@ -3,7 +3,9 @@ package by.aurorasoft.kafka.replication.it;
 import by.aurorasoft.kafka.base.kafka.AbstractKafkaContainerTest;
 import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.dto.PersonReplication;
+import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.entity.PersonReplicationEntity;
+import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
 import by.aurorasoft.kafka.replication.it.crud.mapper.PersonReplicationMapper;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonReplicationRepository;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
@@ -40,19 +42,23 @@ public class ReplicationIT extends AbstractKafkaContainerTest {
     @Autowired
     private PersonReplicationMapper replicationMapper;
 
+    @Autowired
+    private PersonMapper mapper;
+
     @Test
-    @Transactional(propagation = NOT_SUPPORTED)
+//    @Transactional(propagation = NOT_SUPPORTED)
     @Sql(statements = "DELETE FROM persons", executionPhase = AFTER_TEST_METHOD)
     @Sql(statements = "DELETE FROM person_replications", executionPhase = AFTER_TEST_METHOD)
     public void personShouldBeSavedWithReplication() {
         final Person givenPerson = Person.builder()
-                .id(256L)
                 .name("Vlad")
                 .surname("Zuev")
+                .patronymic("Sergeevich")
                 .build();
 
-        personService.save(givenPerson);
+       personService.save(givenPerson);
 
+        waitReplicationPerforming();
 
 //        final PersonReplicationEntity givenReplication = PersonReplicationEntity.builder()
 //                .id(256L)
@@ -60,7 +66,7 @@ public class ReplicationIT extends AbstractKafkaContainerTest {
 //                .surname("Zuev")
 //                .build();
 //
-//        replicationRepository.save(givenReplication);
+//        PersonReplicationEntity savedEntity = replicationRepository.save(givenReplication);
 //        entityManager.flush();
     }
 

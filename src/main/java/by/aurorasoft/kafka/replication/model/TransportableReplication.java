@@ -9,18 +9,12 @@ import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.experimental.FieldNameConstants;
-import org.apache.avro.reflect.Nullable;
 
 @AllArgsConstructor
 @Builder
 @FieldNameConstants
 public final class TransportableReplication {
     private final ReplicationType type;
-
-    @Nullable
-    private final String entityIdJsonView;
-
-    @Nullable
     private final String dtoJsonView;
 
     public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final ReplicationConsumingContext<ID, DTO> context) {
@@ -47,11 +41,11 @@ public final class TransportableReplication {
         },
 
         DELETE {
-
             @Override
             public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
                                                                                             final ReplicationConsumingContext<ID, DTO> context) {
-                return new DeleteReplication<>((ID) replication.entityId);
+                final DTO dto = context.mapJsonViewToDto(replication.dtoJsonView);
+                return new DeleteReplication<>(dto);
             }
         };
 
