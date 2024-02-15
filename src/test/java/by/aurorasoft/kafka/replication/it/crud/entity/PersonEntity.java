@@ -3,6 +3,8 @@ package by.aurorasoft.kafka.replication.it.crud.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDate;
+
 import static jakarta.persistence.GenerationType.IDENTITY;
 
 @NoArgsConstructor
@@ -28,4 +30,7 @@ public class PersonEntity extends AbstractEntity<Long> {
 
     @Column(name = "patronymic")
     private String patronymic;
+
+    @Column(name = "birth_date")
+    private LocalDate birthDate;
 }
