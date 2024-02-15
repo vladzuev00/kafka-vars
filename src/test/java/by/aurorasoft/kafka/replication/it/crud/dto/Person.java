@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Value;
 
+import java.time.LocalDate;
+
 @Value
 @AllArgsConstructor
 @Builder
@@ -13,4 +15,5 @@ public class Person implements AbstractDto<Long> {
     String name;
     String surname;
     String patronymic;
+    LocalDate birthDate;
 }

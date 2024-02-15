@@ -14,19 +14,4 @@ public class PersonService extends AbsServiceCRUD<Long, PersonEntity, Person, Pe
     public PersonService(final PersonMapper mapper, final PersonRepository repository) {
         super(mapper, repository);
     }
-
-    @Override
-    public Person save(final Person person) {
-        return super.save(person);
-    }
-
-    @Override
-    public Person update(final Person person) {
-        return super.update(person);
-    }
-
-    @Override
-    public void delete(final Long id) {
-        super.delete(id);
-    }
 }
