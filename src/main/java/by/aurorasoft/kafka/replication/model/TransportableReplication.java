@@ -15,7 +15,7 @@ import lombok.experimental.FieldNameConstants;
 @FieldNameConstants
 public final class TransportableReplication {
     private final ReplicationType type;
-    private final String dtoProjectAsJson;
+    private final String dtoJson;
 
     public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final ReplicationConsumingContext<ID, DTO> context) {
         return type.createReplication(this, context);
@@ -24,32 +24,31 @@ public final class TransportableReplication {
     public enum ReplicationType {
         SAVE {
             @Override
-            public <ID, DTO extends AbstractDto<ID>> SaveReplication<ID, DTO> createReplication(final TransportableReplication replication,
-                                                                                                final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
+            protected <ID, DTO extends AbstractDto<ID>> SaveReplication<ID, DTO> createReplication(final DTO dto) {
                 return new SaveReplication<>(dto);
             }
         },
 
         UPDATE {
             @Override
-            public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
-                                                                                            final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
+            protected <ID, DTO extends AbstractDto<ID>> UpdateReplication<ID, DTO> createReplication(final DTO dto) {
                 return new UpdateReplication<>(dto);
             }
         },
 
         DELETE {
             @Override
-            public <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
-                                                                                            final ReplicationConsumingContext<ID, DTO> context) {
-                final DTO dto = context.mapJsonViewToDto(replication.dtoProjectAsJson);
+            protected <ID, DTO extends AbstractDto<ID>> DeleteReplication<ID, DTO> createReplication(final DTO dto) {
                 return new DeleteReplication<>(dto);
             }
         };
 
-        public abstract <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
-                                                                                                 final ReplicationConsumingContext<ID, DTO> context);
+        public final <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final TransportableReplication replication,
+                                                                                              final ReplicationConsumingContext<ID, DTO> context) {
+            final DTO dto = context.deserializeDto(replication.dtoJson);
+            return createReplication(dto);
+        }
+
+        protected abstract <ID, DTO extends AbstractDto<ID>> Replication<ID, DTO> createReplication(final DTO dto);
     }
 }

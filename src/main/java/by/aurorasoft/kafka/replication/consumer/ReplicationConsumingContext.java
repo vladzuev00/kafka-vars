@@ -10,7 +10,7 @@ public final class ReplicationConsumingContext<ID, DTO extends AbstractDto<ID>> 
     private final ObjectMapper objectMapper;
     private final Class<DTO> dtoType;
 
-    public DTO mapJsonViewToDto(final String view) {
+    public DTO deserializeDto(final String view) {
         try {
             return objectMapper.readValue(view, dtoType);
         } catch (final JsonProcessingException cause) {

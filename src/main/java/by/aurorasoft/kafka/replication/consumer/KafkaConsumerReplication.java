@@ -41,7 +41,7 @@ public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
     private TransportableReplication createTransportableReplication(final GenericRecord record) {
         return new TransportableReplication(
                 valueOf(getString(record, type)),
-                getString(record, dtoProjectAsJson)
+                getString(record, dtoJson)
         );
     }
 }
