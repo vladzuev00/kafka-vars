@@ -98,7 +98,7 @@ public class ReplicationAspect {
 
     }
 
-    @Pointcut("replicatedRudService() && (update() || updatePartial()))")
+    @Pointcut("replicatedRudService() && (update() || updatePartial())")
     private void replicatedUpdate() {
 
     }
@@ -118,7 +118,7 @@ public class ReplicationAspect {
 
     }
 
-    @Pointcut("@within(by.aurorasoft.kafka.replication.annotation.ReplicatedService)")
+    @Pointcut("@target(by.aurorasoft.kafka.replication.annotation.ReplicatedService)")
     private void replicatedService() {
 
     }

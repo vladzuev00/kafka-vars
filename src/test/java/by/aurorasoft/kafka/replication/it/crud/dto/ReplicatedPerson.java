@@ -9,7 +9,7 @@ import lombok.Value;
 import java.time.LocalDate;
 
 @Value
-public class PersonReplication implements AbstractDto<Long> {
+public class ReplicatedPerson implements AbstractDto<Long> {
     Long id;
     String name;
     String surname;
@@ -17,10 +17,10 @@ public class PersonReplication implements AbstractDto<Long> {
 
     @Builder
     @JsonCreator
-    public PersonReplication(@JsonProperty("id") final Long id,
-                             @JsonProperty("name") final String name,
-                             @JsonProperty("surname") final String surname,
-                             @JsonProperty("birthDate") final LocalDate birthDate) {
+    public ReplicatedPerson(@JsonProperty("id") final Long id,
+                            @JsonProperty("name") final String name,
+                            @JsonProperty("surname") final String surname,
+                            @JsonProperty("birthDate") final LocalDate birthDate) {
         this.id = id;
         this.name = name;
         this.surname = surname;

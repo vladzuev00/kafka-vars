@@ -1,7 +1,7 @@
 package by.aurorasoft.kafka.replication.it.kafka.consumer;
 
 import by.aurorasoft.kafka.replication.consumer.KafkaConsumerReplication;
-import by.aurorasoft.kafka.replication.it.crud.dto.PersonReplication;
+import by.aurorasoft.kafka.replication.it.crud.dto.ReplicatedPerson;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.avro.generic.GenericRecord;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public final class KafkaConsumerPersonReplication extends KafkaConsumerReplication<Long, PersonReplication> {
+public final class KafkaConsumerPersonReplication extends KafkaConsumerReplication<Long, ReplicatedPerson> {
 
-    public KafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, PersonReplication, ?> service,
+    public KafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, ReplicatedPerson, ?> service,
                                           final ObjectMapper objectMapper) {
-        super(service, objectMapper, PersonReplication.class);
+        super(service, objectMapper, ReplicatedPerson.class);
     }
 
     @Override

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 @ToString
 @Builder
 @Entity
-@Table(name = "person_replications")
-public class PersonReplicationEntity extends AbstractEntity<Long> {
+@Table(name = "replicated_persons")
+public class ReplicatedPersonEntity extends AbstractEntity<Long> {
 
     @Id
     @Column(name = "id")
@@ -27,7 +27,4 @@ public class PersonReplicationEntity extends AbstractEntity<Long> {
 
     @Column(name = "birth_date")
     private LocalDate birthDate;
-
-    @Version
-    private Long version;
 }

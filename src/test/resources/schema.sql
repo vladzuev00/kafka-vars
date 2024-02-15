@@ -9,10 +9,9 @@ CREATE TABLE persons
     birth_date DATE NOT NULL
 );
 
-CREATE TABLE person_replications(
+CREATE TABLE replicated_persons(
     id INTEGER PRIMARY KEY,
     name VARCHAR(256) NOT NULL,
     surname VARCHAR(256) NOT NULL,
-    birth_date DATE NOT NULL,
-    version INTEGER NOT NULL
+    birth_date DATE NOT NULL
 );

@@ -21,16 +21,4 @@ public final class KafkaProducerPersonReplication extends KafkaProducerReplicati
         super(topicName, kafkaTemplate, schema, objectMapper);
     }
 
-    @Override
-    protected Object projectDto(final Person dto) {
-        return new PersonJsonView(dto.getId(), dto.getName(), dto.getSurname(), dto.getPatronymic());
-    }
-
-    @lombok.Value
-    private static class PersonJsonView {
-        Long id;
-        String name;
-        String surname;
-        String patronymic;
-    }
 }
