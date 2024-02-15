@@ -1,9 +1,6 @@
 package by.aurorasoft.kafka.replication.it.crud.service;
 
-import by.aurorasoft.kafka.replication.annotation.ReplicatedDelete;
-import by.aurorasoft.kafka.replication.annotation.ReplicatedSave;
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
-import by.aurorasoft.kafka.replication.annotation.ReplicatedUpdate;
 import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
@@ -19,19 +16,16 @@ public class PersonService extends AbsServiceCRUD<Long, PersonEntity, Person, Pe
     }
 
     @Override
-    @ReplicatedSave
     public Person save(final Person person) {
         return super.save(person);
     }
 
     @Override
-    @ReplicatedUpdate
     public Person update(final Person person) {
         return super.update(person);
     }
 
     @Override
-    @ReplicatedDelete
     public void delete(final Long id) {
         super.delete(id);
     }

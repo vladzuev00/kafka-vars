@@ -17,12 +17,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
-//TODO: попробывать оставить с generic-ами
 @Aspect
 @Component
 public class ReplicationAspect {
@@ -32,29 +30,33 @@ public class ReplicationAspect {
         producersByTypes = createProducersByTypes(producers);
     }
 
-    @AfterReturning(pointcut = "replicatedService() && replicatedSave()", returning = "savedDto")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @AfterReturning(pointcut = "replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto savedDto) {
         findProducer(joinPoint).send(new SaveReplication(savedDto));
     }
 
-    @AfterReturning(pointcut = "replicatedService() && replicatedSaveAll()", returning = "savedDtos")
-    public <ID, DTO extends AbstractDto<ID>> void replicateSaveAll(final JoinPoint joinPoint, final List<DTO> savedDtos) {
+    @SuppressWarnings("rawtypes")
+    @AfterReturning(pointcut = "replicatedSaveAll()", returning = "savedDtos")
+    public void replicateSaveAll(final JoinPoint joinPoint, final List<AbstractDto> savedDtos) {
         savedDtos.forEach(dto -> replicateSave(joinPoint, dto));
     }
 
-    @AfterReturning(value = "replicatedService() && replicatedUpdate()", returning = "updatedDto")
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @AfterReturning(value = "replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
-        findProducer(joinPoint).send(new UpdateReplication(updatedDto));
+        findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
     }
 
-    @SuppressWarnings("unchecked")
-    @Around("replicatedService() && replicatedDelete()")
-    public <ID, DTO extends AbstractDto<ID>> Object replicateDelete(final ProceedingJoinPoint joinPoint) throws Throwable {
-        final AbsServiceCRUD<ID, ?, DTO, ?> service = (AbsServiceCRUD<ID, ?, DTO, ?>) joinPoint.getTarget();
-        final ID entityId = (ID) joinPoint.getArgs()[0];
-        final DTO dto = service.getById(entityId);
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    @Around("replicatedDeleteById()")
+    public Object replicateDeleteById(final ProceedingJoinPoint joinPoint)
+            throws Throwable {
+        final Object entityId = joinPoint.getArgs()[0];
+        final AbsServiceCRUD service = (AbsServiceCRUD) joinPoint.getTarget();
+        final AbstractDto dto = service.getById(entityId);
         final Object result = joinPoint.proceed();
-        this.<ID, DTO>findProducer(joinPoint).send(new DeleteReplication<>(dto));
+        findProducer(joinPoint).send(new DeleteReplication(dto));
         return result;
     }
 
@@ -70,13 +72,9 @@ public class ReplicationAspect {
                 );
     }
 
-    @SuppressWarnings("unchecked")
-    private <ID, DTO extends AbstractDto<ID>> KafkaProducerReplication<ID, DTO> findProducer(final JoinPoint joinPoint) {
+    private KafkaProducerReplication<?, ?> findProducer(final JoinPoint joinPoint) {
         final Class<?> producerType = findProducerType(joinPoint);
-        return (KafkaProducerReplication<ID, DTO>) producersByTypes.computeIfAbsent(
-                producerType,
-                this::throwNoProducerException
-        );
+        return producersByTypes.computeIfAbsent(producerType, this::throwNoProducerException);
     }
 
     private static Class<?> findProducerType(final JoinPoint joinPoint) {
@@ -90,28 +88,73 @@ public class ReplicationAspect {
         throw new NoReplicationProducerException("There is no replication producer for type %s".formatted(producerType));
     }
 
-    @Pointcut("within(@by.aurorasoft.kafka.replication.annotation.ReplicatedService *)")
-    private void replicatedService() {
-
-    }
-
-    @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedSave)")
+    @Pointcut("replicatedCrudService() && save()")
     private void replicatedSave() {
 
     }
 
-    @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedSaveAll)")
+    @Pointcut("replicatedCrudService() && saveAll()")
     private void replicatedSaveAll() {
 
     }
 
-    @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedUpdate)")
+    @Pointcut("replicatedRudService() && (update() || updatePartial()))")
     private void replicatedUpdate() {
 
     }
 
-    @Pointcut("@annotation(by.aurorasoft.kafka.replication.annotation.ReplicatedDelete)")
-    private void replicatedDelete() {
+    @Pointcut("replicatedRudService() && deleteById()")
+    private void replicatedDeleteById() {
+
+    }
+
+    @Pointcut("replicatedService() && rudService()")
+    private void replicatedRudService() {
+
+    }
+
+    @Pointcut("replicatedService() && crudService()")
+    private void replicatedCrudService() {
+
+    }
+
+    @Pointcut("@within(by.aurorasoft.kafka.replication.annotation.ReplicatedService)")
+    private void replicatedService() {
+
+    }
+
+    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceRUD)")
+    private void rudService() {
+
+    }
+
+    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD)")
+    private void crudService() {
+
+    }
+
+    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.save(by.nhorushko.crudgeneric.v2.domain.AbstractDto+))")
+    private void save() {
+
+    }
+
+    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.saveAll(java.util.Collection))")
+    private void saveAll() {
+
+    }
+
+    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.update(by.nhorushko.crudgeneric.v2.domain.AbstractDto+))")
+    private void update() {
+
+    }
+
+    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.updatePartial(Object+, Object))")
+    private void updatePartial() {
+
+    }
+
+    @Pointcut("execution(public void *.delete(Object+))")
+    private void deleteById() {
 
     }
 
