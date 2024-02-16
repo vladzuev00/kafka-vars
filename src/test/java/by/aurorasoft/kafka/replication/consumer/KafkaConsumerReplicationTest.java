@@ -1,7 +1,7 @@
 package by.aurorasoft.kafka.replication.consumer;
 
+import by.aurorasoft.kafka.replication.model.ReplicationType;
 import by.aurorasoft.kafka.replication.model.TransportableReplication.Fields;
-import by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static by.aurorasoft.kafka.replication.model.TransportableReplication.ReplicationType.SAVE;
+import static by.aurorasoft.kafka.replication.model.ReplicationType.SAVE;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
