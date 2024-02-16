@@ -1,6 +1,5 @@
 package by.aurorasoft.kafka.replication.consumer;
 
-import by.aurorasoft.kafka.replication.consumer.ReplicatedDtoDeserializer.ReplicatedDtoDeserializationException;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
