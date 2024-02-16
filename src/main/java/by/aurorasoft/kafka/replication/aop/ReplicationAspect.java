@@ -1,6 +1,7 @@
 package by.aurorasoft.kafka.replication.aop;
 
 import by.aurorasoft.kafka.replication.model.replication.DeleteReplication;
+import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
 import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
@@ -12,7 +13,6 @@ import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -21,33 +21,29 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 @Aspect
-@Component
 public class ReplicationAspect {
-    private final Map<Class<?>, KafkaProducerReplication<?, ?>> producersByTrackedServiceTypes;
+    private final Map<Class<?>, KafkaProducerReplication<?, ?>> producersByServiceTypes;
 
     public ReplicationAspect(final List<? extends KafkaProducerReplication<?, ?>> producers) {
-        producersByTrackedServiceTypes = createProducersByReplicatedServiceTypes(producers);
+        producersByServiceTypes = createProducersByServiceTypes(producers);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(pointcut = "replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto savedDto) {
-        //TODO: refactor
-        findProducer(joinPoint).send(new SaveReplication(savedDto));
+        replicate(joinPoint, new SaveReplication(savedDto));
     }
 
     @SuppressWarnings("rawtypes")
     @AfterReturning(pointcut = "replicatedSaveAll()", returning = "savedDtos")
     public void replicateSaveAll(final JoinPoint joinPoint, final List<AbstractDto> savedDtos) {
-        //TODO: refactor
         savedDtos.forEach(dto -> replicateSave(joinPoint, dto));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(value = "replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
-        //TODO: refactor
-        findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
+        replicate(joinPoint, new UpdateReplication<>(updatedDto));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -58,12 +54,11 @@ public class ReplicationAspect {
         final AbsServiceR service = (AbsServiceR) joinPoint.getTarget();
         final AbstractDto dto = service.getById(entityId);
         final Object result = joinPoint.proceed();
-        //TODO: refactor
-        findProducer(joinPoint).send(new DeleteReplication(dto));
+        replicate(joinPoint, new DeleteReplication(dto));
         return result;
     }
 
-    private Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByReplicatedServiceTypes(
+    private Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByServiceTypes(
             final List<? extends KafkaProducerReplication<?, ?>> producers
     ) {
         return producers.stream()
@@ -75,13 +70,14 @@ public class ReplicationAspect {
                 );
     }
 
-    private KafkaProducerReplication<?, ?> findProducer(final JoinPoint joinPoint) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private void replicate(final JoinPoint joinPoint, final Replication replication) {
         final Class<?> serviceType = joinPoint.getTarget().getClass();
-        return producersByTrackedServiceTypes.computeIfAbsent(serviceType, this::throwNoProducerException);
+        producersByServiceTypes.computeIfAbsent(serviceType, this::throwNoProducerException).send(replication);
     }
 
-    private KafkaProducerReplication<?, ?> throwNoProducerException(final Class<?> producerType) {
-        throw new NoReplicationProducerException("There is no replication producer for type %s".formatted(producerType));
+    private KafkaProducerReplication<?, ?> throwNoProducerException(final Class<?> serviceType) {
+        throw new NoReplicationProducerException("There is no replication producer for service %s".formatted(serviceType));
     }
 
     @Pointcut("replicatedCrudService() && save()")
