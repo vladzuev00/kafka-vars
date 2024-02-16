@@ -4,21 +4,29 @@ import by.aurorasoft.kafka.producer.KafkaProducerGenericRecordIntermediaryHooks;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
+import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Getter;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
 public final class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ID, TransportableReplication, Replication<ID, DTO>> {
+
+    @Getter
+    private final Class<? extends AbsServiceRUD<ID, ?, DTO, ?, ?>> replicatedServiceType;
+
     private final ObjectMapper objectMapper;
 
     public KafkaProducerReplication(final String topicName,
                                     final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
                                     final Schema schema,
+                                    final Class<? extends AbsServiceRUD<ID, ?, DTO, ?, ?>> replicatedServiceType,
                                     final ObjectMapper objectMapper) {
         super(topicName, kafkaTemplate, schema);
+        this.replicatedServiceType = replicatedServiceType;
         this.objectMapper = objectMapper;
     }
 
