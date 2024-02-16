@@ -5,10 +5,10 @@ import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.entity.PersonEntity;
 import by.aurorasoft.kafka.replication.it.crud.mapper.PersonMapper;
 import by.aurorasoft.kafka.replication.it.crud.repository.PersonRepository;
-import by.aurorasoft.kafka.replication.it.kafka.producer.KafkaProducerPersonReplication;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
+import org.apache.kafka.common.serialization.LongSerializer;
 
-@ReplicatedService(replicationProducer = KafkaProducerPersonReplication.class)
+@ReplicatedService(keySerializer = LongSerializer.class, topicName = "sync-person")
 public class PersonService extends AbsServiceCRUD<Long, PersonEntity, Person, PersonRepository> {
 
     public PersonService(final PersonMapper mapper, final PersonRepository repository) {

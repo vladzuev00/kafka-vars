@@ -18,7 +18,14 @@ spring:
   kafka:
     bootstrap-servers: 127.0.0.1:9092
 
+
 kafka:
+  entity-replication:
+    producer:
+      batch-size: 10
+      linger-ms: 500
+      delivery-timeout-ms: 100000
+
   topic:
     sync-person:
       name: sync-person

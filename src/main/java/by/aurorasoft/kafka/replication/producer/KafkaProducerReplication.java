@@ -10,7 +10,7 @@ import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericRecord;
 import org.springframework.kafka.core.KafkaTemplate;
 
-public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
+public final class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ID, TransportableReplication, Replication<ID, DTO>> {
     private final ObjectMapper objectMapper;
 
@@ -23,12 +23,12 @@ public abstract class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
     }
 
     @Override
-    protected final ID getTopicKey(final Replication<ID, DTO> replication) {
+    protected ID getTopicKey(final Replication<ID, DTO> replication) {
         return replication.getEntityId();
     }
 
     @Override
-    protected final TransportableReplication convertModelToTransportable(final Replication<ID, DTO> replication) {
+    protected TransportableReplication convertModelToTransportable(final Replication<ID, DTO> replication) {
         try {
             final String dtoJson = objectMapper.writeValueAsString(replication.getDto());
             return new TransportableReplication(replication.getType(), dtoJson);
