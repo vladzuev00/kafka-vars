@@ -18,7 +18,7 @@ public final class UpdateReplication<ID, DTO extends AbstractDto<ID>> extends Re
     }
 
     @Override
-    public void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service, final DTO dto) {
+    protected void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service, final DTO dto) {
         service.update(dto);
     }
 }

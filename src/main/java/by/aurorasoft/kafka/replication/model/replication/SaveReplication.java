@@ -18,7 +18,7 @@ public final class SaveReplication<ID, DTO extends AbstractDto<ID>> extends Repl
     }
 
     @Override
-    public void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service, final DTO dto) {
+    protected void execute(final AbsServiceCRUD<ID, ?, DTO, ?> service, final DTO dto) {
         service.save(dto);
     }
 }
