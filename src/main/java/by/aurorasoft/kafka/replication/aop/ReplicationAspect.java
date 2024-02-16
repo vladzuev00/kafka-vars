@@ -32,18 +32,21 @@ public class ReplicationAspect {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(pointcut = "replicatedSave()", returning = "savedDto")
     public void replicateSave(final JoinPoint joinPoint, final AbstractDto savedDto) {
+        //TODO: refactor
         findProducer(joinPoint).send(new SaveReplication(savedDto));
     }
 
     @SuppressWarnings("rawtypes")
     @AfterReturning(pointcut = "replicatedSaveAll()", returning = "savedDtos")
     public void replicateSaveAll(final JoinPoint joinPoint, final List<AbstractDto> savedDtos) {
+        //TODO: refactor
         savedDtos.forEach(dto -> replicateSave(joinPoint, dto));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(value = "replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
+        //TODO: refactor
         findProducer(joinPoint).send(new UpdateReplication<>(updatedDto));
     }
 
@@ -55,6 +58,7 @@ public class ReplicationAspect {
         final AbsServiceR service = (AbsServiceR) joinPoint.getTarget();
         final AbstractDto dto = service.getById(entityId);
         final Object result = joinPoint.proceed();
+        //TODO: refactor
         findProducer(joinPoint).send(new DeleteReplication(dto));
         return result;
     }
