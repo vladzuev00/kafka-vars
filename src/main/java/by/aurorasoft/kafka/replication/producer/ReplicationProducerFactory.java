@@ -2,12 +2,12 @@ package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.aurorasoft.kafka.replication.config.ReplicationProducerConfig;
+import by.aurorasoft.kafka.replication.serviceholder.ReplicatedServiceHolder;
 import by.aurorasoft.kafka.serialize.AvroGenericRecordSerializer;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.avro.Schema;
 import org.apache.kafka.common.serialization.Serializer;
-import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -26,41 +26,39 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 public final class ReplicationProducerFactory {
     private static final String PRODUCER_CONFIG_KEY_SCHEMA = "SCHEMA";
 
+    private final ReplicatedServiceHolder replicatedServiceHolder;
     private final ObjectMapper objectMapper;
     private final ReplicationProducerConfig producerConfig;
     private final Schema schema;
     private final String bootstrapAddress;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public ReplicationProducerFactory(final ObjectMapper objectMapper,
+    public ReplicationProducerFactory(final ReplicatedServiceHolder replicatedServiceHolder,
+                                      final ObjectMapper objectMapper,
                                       final ReplicationProducerConfig producerConfig,
                                       @Qualifier("replicationSchema") final Schema schema,
                                       @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
+        this.replicatedServiceHolder = replicatedServiceHolder;
         this.objectMapper = objectMapper;
         this.producerConfig = producerConfig;
         this.schema = schema;
         this.bootstrapAddress = bootstrapAddress;
     }
 
-    public List<? extends KafkaProducerReplication<?, ?>> create(final List<AbsServiceRUD<?, ?, ?, ?, ?>> services) {
-        return services.stream()
-                .map(AopProxyUtils::ultimateTargetClass)
-                .filter(ReplicationProducerFactory::isReplicatedService)
+    public List<? extends KafkaProducerReplication<?, ?>> create() {
+        return replicatedServiceHolder.getServices()
+                .stream()
                 .map(this::createProducer)
                 .toList();
     }
 
-    private static boolean isReplicatedService(final Class<?> serviceType) {
-        return serviceType.isAnnotationPresent(ReplicatedService.class);
-    }
-
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private KafkaProducerReplication<?, ?> createProducer(final Class serviceType) {
-        final ReplicatedService annotation = requireNonNull(getAnnotation(serviceType, ReplicatedService.class));
+    private KafkaProducerReplication<?, ?> createProducer(final AbsServiceRUD<?, ?, ?, ?, ?> service) {
+        final ReplicatedService annotation = service.getClass().getAnnotation(ReplicatedService.class);
         final Map<String, Object> configsByKeys = createProducerConfigsByKeys(annotation.keySerializer());
         final ProducerFactory producerFactory = new DefaultKafkaProducerFactory(configsByKeys);
         final KafkaTemplate kafkaTemplate = new KafkaTemplate(producerFactory);
-        return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, serviceType, objectMapper);
+        return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, service, objectMapper);
     }
 
     private Map<String, Object> createProducerConfigsByKeys(final Class<? extends Serializer<?>> keySerializer) {

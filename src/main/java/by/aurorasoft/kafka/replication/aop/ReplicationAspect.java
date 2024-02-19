@@ -64,7 +64,7 @@ public class ReplicationAspect {
         return producers.stream()
                 .collect(
                         toMap(
-                                KafkaProducerReplication::getReplicatedServiceType,
+                                KafkaProducerReplication::getReplicatedService,
                                 identity()
                         )
                 );

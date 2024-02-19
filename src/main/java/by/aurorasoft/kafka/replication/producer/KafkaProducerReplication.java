@@ -16,17 +16,17 @@ public final class KafkaProducerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaProducerGenericRecordIntermediaryHooks<ID, TransportableReplication, Replication<ID, DTO>> {
 
     @Getter
-    private final Class<? extends AbsServiceRUD<ID, ?, DTO, ?, ?>> replicatedServiceType;
+    private final AbsServiceRUD<ID, ?, DTO, ?, ?> replicatedService;
 
     private final ObjectMapper objectMapper;
 
     public KafkaProducerReplication(final String topicName,
                                     final KafkaTemplate<ID, GenericRecord> kafkaTemplate,
                                     final Schema schema,
-                                    final Class<? extends AbsServiceRUD<ID, ?, DTO, ?, ?>> replicatedServiceType,
+                                    final AbsServiceRUD<ID, ?, DTO, ?, ?> replicatedService,
                                     final ObjectMapper objectMapper) {
         super(topicName, kafkaTemplate, schema);
-        this.replicatedServiceType = replicatedServiceType;
+        this.replicatedService = replicatedService;
         this.objectMapper = objectMapper;
     }
 
