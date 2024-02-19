@@ -23,7 +23,7 @@ import static org.apache.kafka.clients.producer.ProducerConfig.*;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 @Component
-public final class ReplicationProducerFactory {
+public final class KafkaProducerReplicationFactory {
     private static final String PRODUCER_CONFIG_KEY_SCHEMA = "SCHEMA";
 
     private final ReplicatedServiceHolder replicatedServiceHolder;
@@ -33,11 +33,11 @@ public final class ReplicationProducerFactory {
     private final String bootstrapAddress;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public ReplicationProducerFactory(final ReplicatedServiceHolder replicatedServiceHolder,
-                                      final ObjectMapper objectMapper,
-                                      final ReplicationProducerConfig producerConfig,
-                                      @Qualifier("replicationSchema") final Schema schema,
-                                      @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
+    public KafkaProducerReplicationFactory(final ReplicatedServiceHolder replicatedServiceHolder,
+                                           final ObjectMapper objectMapper,
+                                           final ReplicationProducerConfig producerConfig,
+                                           @Qualifier("replicationSchema") final Schema schema,
+                                           @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
         this.replicatedServiceHolder = replicatedServiceHolder;
         this.objectMapper = objectMapper;
         this.producerConfig = producerConfig;

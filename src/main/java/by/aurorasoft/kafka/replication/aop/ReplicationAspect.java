@@ -5,8 +5,10 @@ import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
 import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
+import by.aurorasoft.kafka.replication.producer.KafkaProducerReplicationFactory;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceR;
+import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
@@ -22,10 +24,10 @@ import static java.util.stream.Collectors.toMap;
 
 @Aspect
 public class ReplicationAspect {
-    private final Map<Class<?>, KafkaProducerReplication<?, ?>> producersByServiceTypes;
+    private final Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> producersByServices;
 
-    public ReplicationAspect(final List<? extends KafkaProducerReplication<?, ?>> producers) {
-        producersByServiceTypes = createProducersByServiceTypes(producers);
+    public ReplicationAspect(final KafkaProducerReplicationFactory factory) {
+        producersByServices = createProducersByServices(factory);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -58,27 +60,29 @@ public class ReplicationAspect {
         return result;
     }
 
-    private Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByServiceTypes(
-            final List<? extends KafkaProducerReplication<?, ?>> producers
+    private Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> createProducersByServices(
+            final KafkaProducerReplicationFactory factory
     ) {
-//        return producers.stream()
-//                .collect(
-//                        toMap(
-//                                KafkaProducerReplication::getReplicatedService,
-//                                identity()
-//                        )
-//                );
-        return null;
+        return factory.create()
+                .stream()
+                .collect(
+                        toMap(
+                                KafkaProducerReplication::getReplicatedService,
+                                identity()
+                        )
+                );
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void replicate(final JoinPoint joinPoint, final Replication replication) {
-        final Class<?> serviceType = joinPoint.getTarget().getClass();
-        producersByServiceTypes.computeIfAbsent(serviceType, this::throwNoProducerException).send(replication);
+        final AbsServiceRUD<?, ?, ?, ?, ?> service = (AbsServiceRUD<?, ?, ?, ?, ?>) joinPoint.getTarget();
+        producersByServices.computeIfAbsent(service, this::throwNoProducerException).send(replication);
     }
 
-    private KafkaProducerReplication<?, ?> throwNoProducerException(final Class<?> serviceType) {
-        throw new NoReplicationProducerException("There is no replication producer for service %s".formatted(serviceType));
+    private KafkaProducerReplication<?, ?> throwNoProducerException(final AbsServiceRUD<?, ?, ?, ?, ?> service) {
+        throw new NoReplicationProducerException(
+                "There is no replication producer for service %s".formatted(service.getClass())
+        );
     }
 
     @Pointcut("replicatedCrudService() && save()")
