@@ -61,13 +61,14 @@ public class ReplicationAspect {
     private Map<Class<?>, KafkaProducerReplication<?, ?>> createProducersByServiceTypes(
             final List<? extends KafkaProducerReplication<?, ?>> producers
     ) {
-        return producers.stream()
-                .collect(
-                        toMap(
-                                KafkaProducerReplication::getReplicatedService,
-                                identity()
-                        )
-                );
+//        return producers.stream()
+//                .collect(
+//                        toMap(
+//                                KafkaProducerReplication::getReplicatedService,
+//                                identity()
+//                        )
+//                );
+        return null;
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

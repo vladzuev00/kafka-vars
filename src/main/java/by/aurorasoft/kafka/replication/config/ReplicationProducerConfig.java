@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 //TODO if need: ConstructorBinding
+//TODO: validate
 @RequiredArgsConstructor
 @Getter
 @ConfigurationProperties("kafka.entity-replication.producer")

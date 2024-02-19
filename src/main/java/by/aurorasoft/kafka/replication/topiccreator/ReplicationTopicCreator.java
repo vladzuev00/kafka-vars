@@ -26,8 +26,10 @@ public final class ReplicationTopicCreator {
 
     private void createTopic(final AbsServiceRUD<?, ?, ?, ?, ?> service) {
         final NewTopic topic = TopicBuilder.name(getTopicName(service))
-                .partitions(config.getPartitionCount())
-                .replicas(config.getReplicationFactor())
+//                .partitions(config.getPartitionCount())
+//                .replicas(config.getReplicationFactor())
+                .partitions(1)
+                .replicas(1)
                 .build();
         kafkaAdmin.createOrModifyTopics(topic);
     }

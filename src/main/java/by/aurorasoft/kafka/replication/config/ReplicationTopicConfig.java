@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+//TODO: validate
 @RequiredArgsConstructor
 @Getter
 @ConfigurationProperties("kafka.entity-replication.topic")

@@ -7,6 +7,7 @@ import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
 import by.aurorasoft.kafka.replication.it.crud.service.ReplicatedPersonService;
 import by.aurorasoft.kafka.replication.it.kafka.consumer.KafkaConsumerPersonReplication;
 import org.junit.Test;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
