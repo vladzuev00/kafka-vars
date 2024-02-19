@@ -63,7 +63,6 @@ public final class ReplicationProducerFactory {
         return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, serviceType, objectMapper);
     }
 
-
     private Map<String, Object> createProducerConfigsByKeys(final Class<? extends Serializer<?>> keySerializer) {
         return Map.of(
                 BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
