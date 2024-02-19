@@ -22,7 +22,7 @@ import static org.apache.kafka.clients.producer.ProducerConfig.*;
 import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 @Component
-public final class ReplicationProducersFactory {
+public final class ReplicationProducerFactory {
     private static final String PRODUCER_CONFIG_KEY_SCHEMA = "SCHEMA";
 
     private final ObjectMapper objectMapper;
@@ -33,12 +33,12 @@ public final class ReplicationProducersFactory {
     private final int deliveryTimeoutMs;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public ReplicationProducersFactory(final ObjectMapper objectMapper,
-                                       @Qualifier("replicationSchema") final Schema schema,
-                                       @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress,
-                                       @Value("${kafka.entity-replication.producer.batch-size}") final int batchSize,
-                                       @Value("${kafka.entity-replication.producer.linger-ms}") final int lingerMs,
-                                       @Value("${kafka.entity-replication.producer.delivery-timeout-ms}") final int deliveryTimeoutMs) {
+    public ReplicationProducerFactory(final ObjectMapper objectMapper,
+                                      @Qualifier("replicationSchema") final Schema schema,
+                                      @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress,
+                                      @Value("${kafka.entity-replication.producer.batch-size}") final int batchSize,
+                                      @Value("${kafka.entity-replication.producer.linger-ms}") final int lingerMs,
+                                      @Value("${kafka.entity-replication.producer.delivery-timeout-ms}") final int deliveryTimeoutMs) {
         this.objectMapper = objectMapper;
         this.schema = schema;
         this.bootstrapAddress = bootstrapAddress;
@@ -50,7 +50,7 @@ public final class ReplicationProducersFactory {
     public List<? extends KafkaProducerReplication<?, ?>> create(final List<AbsServiceRUD<?, ?, ?, ?, ?>> services) {
         return services.stream()
                 .map(AopProxyUtils::ultimateTargetClass)
-                .filter(ReplicationProducersFactory::isReplicatedService)
+                .filter(ReplicationProducerFactory::isReplicatedService)
                 .map(this::createProducer)
                 .toList();
     }
