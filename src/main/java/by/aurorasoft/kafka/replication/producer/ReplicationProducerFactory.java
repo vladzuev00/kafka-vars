@@ -1,6 +1,7 @@
 package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
+import by.aurorasoft.kafka.replication.config.ReplicationProducerConfig;
 import by.aurorasoft.kafka.serialize.AvroGenericRecordSerializer;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,25 +27,19 @@ public final class ReplicationProducerFactory {
     private static final String PRODUCER_CONFIG_KEY_SCHEMA = "SCHEMA";
 
     private final ObjectMapper objectMapper;
+    private final ReplicationProducerConfig producerConfig;
     private final Schema schema;
     private final String bootstrapAddress;
-    private final int batchSize;
-    private final int lingerMs;
-    private final int deliveryTimeoutMs;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public ReplicationProducerFactory(final ObjectMapper objectMapper,
+                                      final ReplicationProducerConfig producerConfig,
                                       @Qualifier("replicationSchema") final Schema schema,
-                                      @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress,
-                                      @Value("${kafka.entity-replication.producer.batch-size}") final int batchSize,
-                                      @Value("${kafka.entity-replication.producer.linger-ms}") final int lingerMs,
-                                      @Value("${kafka.entity-replication.producer.delivery-timeout-ms}") final int deliveryTimeoutMs) {
+                                      @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
         this.objectMapper = objectMapper;
+        this.producerConfig = producerConfig;
         this.schema = schema;
         this.bootstrapAddress = bootstrapAddress;
-        this.batchSize = batchSize;
-        this.lingerMs = lingerMs;
-        this.deliveryTimeoutMs = deliveryTimeoutMs;
     }
 
     public List<? extends KafkaProducerReplication<?, ?>> create(final List<AbsServiceRUD<?, ?, ?, ?, ?>> services) {
@@ -74,9 +69,9 @@ public final class ReplicationProducerFactory {
                 BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
                 KEY_SERIALIZER_CLASS_CONFIG, keySerializer,
                 VALUE_SERIALIZER_CLASS_CONFIG, AvroGenericRecordSerializer.class,
-                BATCH_SIZE_CONFIG, batchSize,
-                LINGER_MS_CONFIG, lingerMs,
-                DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs,
+                BATCH_SIZE_CONFIG, producerConfig.getBatchSize(),
+                LINGER_MS_CONFIG, producerConfig.getLingerMs(),
+                DELIVERY_TIMEOUT_MS_CONFIG, producerConfig.getDeliveryTimeoutMs(),
                 PRODUCER_CONFIG_KEY_SCHEMA, schema
         );
     }

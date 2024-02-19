@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.replication.configuration;
+package by.aurorasoft.kafka.replication.config;
 
 import by.aurorasoft.kafka.replication.aop.ReplicationAspect;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
@@ -14,7 +14,7 @@ import java.util.List;
 
 @Configuration
 @Import({ReplicationProducerFactory.class})
-public class ReplicationConfiguration {
+public class ReplicationConfig {
 
     @Bean
     public Schema replicationSchema() {

@@ -1,6 +1,6 @@
 package by.aurorasoft.kafka.replication.it;
 
-import by.aurorasoft.kafka.base.kafka.AbstractKafkaContainerTest;
+import by.aurorasoft.kafka.base.AbstractSpringBootTest;
 import by.aurorasoft.kafka.replication.it.crud.dto.Person;
 import by.aurorasoft.kafka.replication.it.crud.dto.ReplicatedPerson;
 import by.aurorasoft.kafka.replication.it.crud.service.PersonService;
@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
-public class ReplicationIT extends AbstractKafkaContainerTest {
+public class ReplicationIT extends AbstractSpringBootTest {
 
     @Autowired
     private PersonService personService;

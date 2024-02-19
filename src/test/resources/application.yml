@@ -21,6 +21,9 @@ spring:
 
 kafka:
   entity-replication:
+    topic:
+      numPartitions: 1
+      replication-factor: 3
     producer:
       batch-size: 10
       linger-ms: 500
