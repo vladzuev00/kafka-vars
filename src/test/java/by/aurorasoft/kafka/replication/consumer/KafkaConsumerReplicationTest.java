@@ -9,30 +9,39 @@ import by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Builder;
 import lombok.Value;
 import org.apache.avro.generic.GenericRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import static by.aurorasoft.kafka.replication.model.ReplicationType.SAVE;
+import java.util.List;
+
+import static by.aurorasoft.kafka.replication.model.ReplicationType.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.same;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public final class KafkaConsumerReplicationTest {
 
     @Mock
-    private AbsServiceCRUD<Long, ?, TestPerson, ?> mockedService;
+    private AbsServiceCRUD<Long, ?, TestDto, ?> mockedService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private KafkaConsumerReplication<Long, TestPerson> consumer;
+    private KafkaConsumerReplication<Long, TestDto> consumer;
+
+    @Captor
+    private ArgumentCaptor<TestDto> dtoArgumentCaptor;
+
+    @Captor
+    private ArgumentCaptor<Long> longArgumentCaptor;
 
     @Before
     public void initializeConsumer() {
@@ -41,19 +50,48 @@ public final class KafkaConsumerReplicationTest {
 
     @Test
     public void recordShouldBeMappedToReplication() {
-        final String givenDtoJson = "{\"id\":255,\"name\":\"Vlad\",\"surname\":\"Zuev\",\"patronymic\":\"Sergeevich\"}";
+        final String givenDtoJson = "{\"id\":255}";
         final GenericRecord givenGenericRecord = createGenericRecord(SAVE, givenDtoJson);
 
-        final Replication<Long, TestPerson> actual = consumer.map(givenGenericRecord);
-        final Replication<Long, TestPerson> expected = new SaveReplication<>(
-                TestPerson.builder()
-                        .id(255L)
-                        .name("Vlad")
-                        .surname("Zuev")
-                        .patronymic("Sergeevich")
-                        .build()
-        );
+        final Replication<Long, TestDto> actual = consumer.map(givenGenericRecord);
+        final Replication<Long, TestDto> expected = new SaveReplication<>(new TestDto(255L));
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void recordsShouldBeListened() {
+        final List<ConsumerRecord<Long, GenericRecord>> givenConsumerRecords = List.of(
+                createConsumerRecord(255L, SAVE, "{\"id\":255}"),
+                createConsumerRecord(256L, UPDATE, "{\"id\":256}"),
+                createConsumerRecord(257L, DELETE, "{\"id\":257}")
+        );
+
+        consumer.listen(givenConsumerRecords);
+
+        verify(mockedService, times(1)).save(dtoArgumentCaptor.capture());
+        verify(mockedService, times(1)).update(dtoArgumentCaptor.capture());
+        verify(mockedService, times(1)).delete(longArgumentCaptor.capture());
+
+        final List<TestDto> actualCapturedDtos = dtoArgumentCaptor.getAllValues();
+
+        final TestDto actualSavedDto = actualCapturedDtos.get(0);
+        final TestDto expectedSavedDto = new TestDto(255L);
+        assertEquals(expectedSavedDto, actualSavedDto);
+
+        final TestDto actualUpdatedDto = actualCapturedDtos.get(1);
+        final TestDto expectedUpdatedDto = new TestDto(256L);
+        assertEquals(expectedUpdatedDto, actualUpdatedDto);
+
+        final Long actualDeletedEntityId = longArgumentCaptor.getValue();
+        final Long expectedDeletedEntityId = 257L;
+        assertEquals(expectedDeletedEntityId, actualDeletedEntityId);
+    }
+
+    private static ConsumerRecord<Long, GenericRecord> createConsumerRecord(final Long id,
+                                                                            final ReplicationType replicationType,
+                                                                            final String dtoJson) {
+        final GenericRecord genericRecord = createGenericRecord(replicationType, dtoJson);
+        return new ConsumerRecord<>("", Integer.MIN_VALUE, Long.MIN_VALUE, id, genericRecord);
     }
 
     @SuppressWarnings("SameParameterValue")
@@ -64,31 +102,21 @@ public final class KafkaConsumerReplicationTest {
         return record;
     }
 
-    private static final class TestKafkaConsumerPersonReplication extends KafkaConsumerReplication<Long, TestPerson> {
+    private static final class TestKafkaConsumerPersonReplication extends KafkaConsumerReplication<Long, TestDto> {
 
-        public TestKafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, TestPerson, ?> service,
+        public TestKafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, TestDto, ?> service,
                                                   final ObjectMapper objectMapper) {
-            super(service, objectMapper, TestPerson.class);
+            super(service, objectMapper, TestDto.class);
         }
     }
 
     @Value
-    private static class TestPerson implements AbstractDto<Long> {
+    private static class TestDto implements AbstractDto<Long> {
         Long id;
-        String name;
-        String surname;
-        String patronymic;
 
-        @Builder
         @JsonCreator
-        public TestPerson(@JsonProperty("id") final Long id,
-                          @JsonProperty("name") final String name,
-                          @JsonProperty("surname") final String surname,
-                          @JsonProperty("patronymic") final String patronymic) {
+        public TestDto(@JsonProperty("id") final Long id) {
             this.id = id;
-            this.name = name;
-            this.surname = surname;
-            this.patronymic = patronymic;
         }
     }
 }
