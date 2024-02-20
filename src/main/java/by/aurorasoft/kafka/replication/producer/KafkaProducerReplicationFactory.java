@@ -2,7 +2,7 @@ package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.aurorasoft.kafka.replication.config.ReplicationProducerConfig;
-import by.aurorasoft.kafka.replication.serviceholder.ReplicatedServiceHolder;
+import by.aurorasoft.kafka.replication.holder.ReplicatedServiceHolder;
 import by.aurorasoft.kafka.serialize.AvroGenericRecordSerializer;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import com.fasterxml.jackson.databind.ObjectMapper;

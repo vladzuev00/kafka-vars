@@ -1,4 +1,4 @@
-package by.aurorasoft.kafka.replication.serviceholder;
+package by.aurorasoft.kafka.replication.holder;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;

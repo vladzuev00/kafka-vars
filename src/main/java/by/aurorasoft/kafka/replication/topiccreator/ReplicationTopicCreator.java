@@ -2,7 +2,7 @@ package by.aurorasoft.kafka.replication.topiccreator;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.aurorasoft.kafka.replication.config.ReplicationTopicConfig;
-import by.aurorasoft.kafka.replication.serviceholder.ReplicatedServiceHolder;
+import by.aurorasoft.kafka.replication.holder.ReplicatedServiceHolder;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;

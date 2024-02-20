@@ -45,7 +45,6 @@ public class ReplicationAspect {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(value = "replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
-        System.out.println(joinPoint.getThis());
         replicate(joinPoint, new UpdateReplication<>(updatedDto));
     }
 
