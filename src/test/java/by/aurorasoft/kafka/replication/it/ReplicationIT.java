@@ -72,7 +72,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Test
     @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
     public void personsAndReplicatedPersonsShouldBeSaved() {
-
+        throw new RuntimeException();
     }
 
     @Test
