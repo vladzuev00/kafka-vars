@@ -2,7 +2,6 @@ package by.aurorasoft.kafka.replication.holder;
 
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,7 +13,6 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 
 @Component
-@Getter
 public final class KafkaProducerReplicationHolder {
     private final Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> producersByServices;
 
