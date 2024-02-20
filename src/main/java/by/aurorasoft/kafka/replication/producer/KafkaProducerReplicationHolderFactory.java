@@ -31,6 +31,7 @@ public final class KafkaProducerReplicationHolderFactory {
     private final Schema schema;
     private final String bootstrapAddress;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public KafkaProducerReplicationHolderFactory(final ReplicatedServiceHolder replicatedServiceHolder,
                                                  final ObjectMapper objectMapper,
                                                  final ReplicationProducerConfig producerConfig,
