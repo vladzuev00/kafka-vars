@@ -1,5 +1,6 @@
 package by.aurorasoft.kafka.replication.config;
 
+import by.aurorasoft.kafka.replication.aop.ReplicationAspect;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.producer.KafkaProducerReplicationFactory;
 import org.apache.avro.Schema;
@@ -9,7 +10,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 @Configuration
-@Import({KafkaProducerReplicationFactory.class})
+@Import(
+        {
+                KafkaProducerReplicationFactory.class,
+                ReplicationAspect.class
+        }
+)
 public class ReplicationConfig {
 
     @Bean
