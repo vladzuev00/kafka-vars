@@ -15,10 +15,7 @@ public final class ReplicationAspectTest extends AbstractSpringBootTest {
 
 
     @Value
-    private static class TestPerson implements AbstractDto<Long> {
+    private static class TestDto implements AbstractDto<Long> {
         Long id;
-        String name;
-        String surname;
-        String patronymic;
     }
 }

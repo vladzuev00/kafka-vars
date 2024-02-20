@@ -16,17 +16,12 @@ import static by.aurorasoft.kafka.replication.model.ReplicationType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public final class ReplicationTypeTest {
-    private static final TestPerson GIVEN_DTO = new TestPerson(
-            255L,
-            "Vlad",
-            "Zuev",
-            "Sergeevich"
-    );
+    private static final TestDto GIVEN_DTO = new TestDto(255L);
 
     @ParameterizedTest
     @MethodSource("provideTypeAndExpected")
-    public void replicationShouldBeCreated(final ReplicationType givenType, final Replication<Long, TestPerson> expected) {
-        final Replication<Long, TestPerson> actual = givenType.createReplication(GIVEN_DTO);
+    public void replicationShouldBeCreated(final ReplicationType givenType, final Replication<Long, TestDto> expected) {
+        final Replication<Long, TestDto> actual = givenType.createReplication(GIVEN_DTO);
         assertEquals(expected, actual);
     }
 
@@ -39,10 +34,7 @@ public final class ReplicationTypeTest {
     }
 
     @Value
-    private static class TestPerson implements AbstractDto<Long> {
+    private static class TestDto implements AbstractDto<Long> {
         Long id;
-        String name;
-        String surname;
-        String patronymic;
     }
 }

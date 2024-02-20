@@ -18,9 +18,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Map;
 
-import static java.util.Objects.requireNonNull;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
-import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 @Component
 public final class KafkaProducerReplicationFactory {
@@ -32,7 +30,6 @@ public final class KafkaProducerReplicationFactory {
     private final Schema schema;
     private final String bootstrapAddress;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     public KafkaProducerReplicationFactory(final ReplicatedServiceHolder replicatedServiceHolder,
                                            final ObjectMapper objectMapper,
                                            final ReplicationProducerConfig producerConfig,
