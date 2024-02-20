@@ -1,34 +1,29 @@
 package by.aurorasoft.kafka.replication.aop;
 
+import by.aurorasoft.kafka.replication.holder.KafkaProducerReplicationHolder;
 import by.aurorasoft.kafka.replication.model.replication.DeleteReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
 import by.aurorasoft.kafka.replication.model.replication.SaveReplication;
 import by.aurorasoft.kafka.replication.model.replication.UpdateReplication;
-import by.aurorasoft.kafka.replication.producer.KafkaProducerReplication;
-import by.aurorasoft.kafka.replication.producer.KafkaProducerReplicationFactory;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceR;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
+import lombok.RequiredArgsConstructor;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 
 @Aspect
+@Component
+@RequiredArgsConstructor
 public class ReplicationAspect {
-    private final Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> producersByServices;
-
-    public ReplicationAspect(final KafkaProducerReplicationFactory factory) {
-        producersByServices = createProducersByServices(factory);
-    }
+    private final KafkaProducerReplicationHolder producerHolder;
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(pointcut = "replicatedSave()", returning = "savedDto")
@@ -45,7 +40,7 @@ public class ReplicationAspect {
     @SuppressWarnings({"rawtypes", "unchecked"})
     @AfterReturning(value = "replicatedUpdate()", returning = "updatedDto")
     public void replicateUpdate(final JoinPoint joinPoint, final AbstractDto updatedDto) {
-        replicate(joinPoint, new UpdateReplication<>(updatedDto));
+        replicate(joinPoint, new UpdateReplication(updatedDto));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -60,26 +55,15 @@ public class ReplicationAspect {
         return result;
     }
 
-    private Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> createProducersByServices(
-            final KafkaProducerReplicationFactory factory
-    ) {
-        return factory.create()
-                .stream()
-                .collect(
-                        toMap(
-                                KafkaProducerReplication::getReplicatedService,
-                                identity()
-                        )
-                );
-    }
-
     @SuppressWarnings({"rawtypes", "unchecked"})
     private void replicate(final JoinPoint joinPoint, final Replication replication) {
         final AbsServiceRUD<?, ?, ?, ?, ?> service = (AbsServiceRUD<?, ?, ?, ?, ?>) joinPoint.getTarget();
-        producersByServices.computeIfAbsent(service, this::throwNoProducerException).send(replication);
+        producerHolder.findByService(service)
+                .orElseThrow(() -> createNoProducerException(service))
+                .send(replication);
     }
 
-    private KafkaProducerReplication<?, ?> throwNoProducerException(final AbsServiceRUD<?, ?, ?, ?, ?> service) {
+    private NoReplicationProducerException createNoProducerException(final AbsServiceRUD<?, ?, ?, ?, ?> service) {
         throw new NoReplicationProducerException(
                 "There is no replication producer for service %s".formatted(service.getClass())
         );
@@ -120,27 +104,36 @@ public class ReplicationAspect {
 
     }
 
-    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceRUD)")
+    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceRUD+)")
     private void rudService() {
 
     }
 
-    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD)")
+    @Pointcut("target(by.nhorushko.crudgeneric.v2.service.AbsServiceCRUD+)")
     private void crudService() {
 
     }
 
-    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.save(by.nhorushko.crudgeneric.v2.domain.AbstractDto+))")
+    @Pointcut(
+            "execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.save("
+                    + "by.nhorushko.crudgeneric.v2.domain.AbstractDto+))"
+    )
     private void save() {
 
     }
 
-    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.saveAll(java.util.Collection))")
+    @Pointcut(
+            "execution(public java.util.List<by.nhorushko.crudgeneric.v2.domain.AbstractDto+> *.saveAll("
+                    + "java.util.Collection<by.nhorushko.crudgeneric.v2.domain.AbstractDto+>))"
+    )
     private void saveAll() {
 
     }
 
-    @Pointcut("execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.update(by.nhorushko.crudgeneric.v2.domain.AbstractDto+))")
+    @Pointcut(
+            "execution(public by.nhorushko.crudgeneric.v2.domain.AbstractDto+ *.update("
+                    + "by.nhorushko.crudgeneric.v2.domain.AbstractDto+))"
+    )
     private void update() {
 
     }
