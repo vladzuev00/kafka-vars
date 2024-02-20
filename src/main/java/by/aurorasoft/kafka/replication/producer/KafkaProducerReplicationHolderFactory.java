@@ -2,6 +2,7 @@ package by.aurorasoft.kafka.replication.producer;
 
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.aurorasoft.kafka.replication.config.ReplicationProducerConfig;
+import by.aurorasoft.kafka.replication.holder.KafkaProducerReplicationHolder;
 import by.aurorasoft.kafka.replication.holder.ReplicatedServiceHolder;
 import by.aurorasoft.kafka.serialize.AvroGenericRecordSerializer;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
@@ -21,7 +22,7 @@ import java.util.Map;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 @Component
-public final class KafkaProducerReplicationFactory {
+public final class KafkaProducerReplicationHolderFactory {
     private static final String PRODUCER_CONFIG_KEY_SCHEMA = "SCHEMA";
 
     private final ReplicatedServiceHolder replicatedServiceHolder;
@@ -30,11 +31,11 @@ public final class KafkaProducerReplicationFactory {
     private final Schema schema;
     private final String bootstrapAddress;
 
-    public KafkaProducerReplicationFactory(final ReplicatedServiceHolder replicatedServiceHolder,
-                                           final ObjectMapper objectMapper,
-                                           final ReplicationProducerConfig producerConfig,
-                                           @Qualifier("replicationSchema") final Schema schema,
-                                           @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
+    public KafkaProducerReplicationHolderFactory(final ReplicatedServiceHolder replicatedServiceHolder,
+                                                 final ObjectMapper objectMapper,
+                                                 final ReplicationProducerConfig producerConfig,
+                                                 @Qualifier("replicationSchema") final Schema schema,
+                                                 @Value("${spring.kafka.bootstrap-servers}") final String bootstrapAddress) {
         this.replicatedServiceHolder = replicatedServiceHolder;
         this.objectMapper = objectMapper;
         this.producerConfig = producerConfig;
@@ -42,11 +43,12 @@ public final class KafkaProducerReplicationFactory {
         this.bootstrapAddress = bootstrapAddress;
     }
 
-    public List<? extends KafkaProducerReplication<?, ?>> create() {
-        return replicatedServiceHolder.getServices()
+    public KafkaProducerReplicationHolder create() {
+        final List<? extends KafkaProducerReplication<?, ?>> producers = replicatedServiceHolder.getServices()
                 .stream()
                 .map(this::createProducer)
                 .toList();
+        return new KafkaProducerReplicationHolder(producers);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
