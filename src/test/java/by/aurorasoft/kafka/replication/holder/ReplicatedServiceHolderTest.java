@@ -2,8 +2,8 @@ package by.aurorasoft.kafka.replication.holder;
 
 import by.aurorasoft.kafka.base.AbstractSpringBootTest;
 import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
-import by.aurorasoft.kafka.replication.it.crud.entity.AbstractEntity;
 import by.nhorushko.crudgeneric.v2.domain.AbstractDto;
+import by.nhorushko.crudgeneric.v2.domain.AbstractEntity;
 import by.nhorushko.crudgeneric.v2.mapper.AbsMapperEntityDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import org.apache.kafka.common.serialization.LongSerializer;
