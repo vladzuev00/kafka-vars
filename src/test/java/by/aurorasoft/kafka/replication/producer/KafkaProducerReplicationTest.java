@@ -20,7 +20,6 @@ public final class KafkaProducerReplicationTest {
             null,
             null,
             null,
-            null,
             objectMapper
     );
 

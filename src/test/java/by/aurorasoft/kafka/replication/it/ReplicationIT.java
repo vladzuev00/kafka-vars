@@ -59,7 +59,7 @@ import static org.springframework.kafka.listener.ContainerProperties.AckMode.MAN
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
-//TODO: put @Sql annotation for class
+//TODO: put after @Sql annotation for class
 @Import(ReplicationIT.TestConfiguration.class)
 public class ReplicationIT extends AbstractSpringBootTest {
 
@@ -74,7 +74,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
 
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
-    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personAndReplicatedPersonShouldBeSaved() {
         final String givenName = "Vlad";
         final String givenSurname = "Zuev";
@@ -112,7 +112,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     }
 
     @Test
-    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personsAndReplicatedPersonsShouldBeSaved() {
         throw new RuntimeException();
     }
@@ -120,7 +120,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
     @Sql("classpath:sql-scripts/replication/it/insert-person.sql")
-    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personAndReplicatedPersonShouldBeUpdated() {
         final Long givenId = 255L;
         final String givenNewName = "Ivan";
@@ -153,7 +153,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
     @Sql("classpath:sql-scripts/replication/it/insert-person.sql")
-    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personAndReplicatedPersonShouldBeUpdatedPartially() {
         final Long givenId = 255L;
 
@@ -188,7 +188,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Test
     @Transactional(propagation = NOT_SUPPORTED)
     @Sql("classpath:sql-scripts/replication/it/insert-person.sql")
-    @Sql(value = "classpath:sql-scripts/replication/it/after.sql", executionPhase = AFTER_TEST_METHOD)
+    @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personAndReplicatedPersonShouldBeDeleted() {
         final Long givenId = 255L;
 

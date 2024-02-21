@@ -140,6 +140,12 @@
             <version>3.42.0</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+            <version>1.1.1</version>
+        </dependency>
+
     </dependencies>
 
     <build>
@@ -159,6 +165,15 @@
                 <configuration>
                     <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
                     </altDeploymentRepository>
+
+                    <generatedSourcesDirectory>${project.build.directory}
+                        /generated-sources/</generatedSourcesDirectory>
+                    <annotationProcessors>
+                        <annotationProcessor>
+                            by.aurorasoft.kafka.replication.annotation.ReplicatedServiceProcessor
+                        </annotationProcessor>
+                    </annotationProcessors>
+
                 </configuration>
             </plugin>
 
