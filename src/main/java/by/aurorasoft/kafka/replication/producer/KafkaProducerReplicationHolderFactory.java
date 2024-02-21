@@ -16,9 +16,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Map;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.kafka.clients.producer.ProducerConfig.*;
 
 @Component
@@ -45,11 +47,9 @@ public final class KafkaProducerReplicationHolderFactory {
     }
 
     public KafkaProducerReplicationHolder create() {
-        final List<? extends KafkaProducerReplication<?, ?>> producers = replicatedServiceHolder.getServices()
+        return replicatedServiceHolder.getServices()
                 .stream()
-                .map(this::createProducer)
-                .toList();
-        return new KafkaProducerReplicationHolder(producers);
+                .collect(collectingAndThen(toMap(identity(), this::createProducer), KafkaProducerReplicationHolder::new));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -58,7 +58,7 @@ public final class KafkaProducerReplicationHolderFactory {
         final Map<String, Object> configsByKeys = createProducerConfigsByKeys(annotation.keySerializer());
         final ProducerFactory producerFactory = new DefaultKafkaProducerFactory(configsByKeys);
         final KafkaTemplate kafkaTemplate = new KafkaTemplate(producerFactory);
-        return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, service, objectMapper);
+        return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, objectMapper);
     }
 
     private Map<String, Object> createProducerConfigsByKeys(final Class<? extends Serializer<?>> keySerializer) {
