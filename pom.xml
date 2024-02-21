@@ -133,6 +133,13 @@
             <artifactId>spring-boot</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.checkerframework/javacutil -->
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>javacutil</artifactId>
+            <version>3.42.0</version>
+        </dependency>
+
     </dependencies>
 
     <build>

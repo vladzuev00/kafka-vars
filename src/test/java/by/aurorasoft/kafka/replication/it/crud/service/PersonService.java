@@ -10,8 +10,8 @@ import org.apache.kafka.common.serialization.LongSerializer;
 import org.springframework.stereotype.Service;
 
 //TODO: put all in it test to not show it for other tests
-//@ReplicatedService(topicName = "sync-person", keySerializer = LongSerializer.class)
-@Service
+@ReplicatedService(topicName = "sync-person", keySerializer = LongSerializer.class)
+//@Service
 public class PersonService extends AbsServiceCRUD<Long, PersonEntity, Person, PersonRepository> {
 
     public PersonService(final PersonMapper mapper, final PersonRepository repository) {

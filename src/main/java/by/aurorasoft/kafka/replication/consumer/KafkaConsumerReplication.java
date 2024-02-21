@@ -1,6 +1,7 @@
 package by.aurorasoft.kafka.replication.consumer;
 
 import by.aurorasoft.kafka.consumer.KafkaConsumerGenericRecordBatch;
+import by.aurorasoft.kafka.replication.annotation.ReplicatedService;
 import by.aurorasoft.kafka.replication.model.ReplicationType;
 import by.aurorasoft.kafka.replication.model.TransportableReplication;
 import by.aurorasoft.kafka.replication.model.replication.Replication;
@@ -11,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.serialization.LongSerializer;
 
 import java.util.List;
 
@@ -18,6 +20,8 @@ import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fie
 import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.type;
 
 @RequiredArgsConstructor
+//TODO: remove @ReplicatedService after processor success
+@ReplicatedService(topicName = "", keySerializer = LongSerializer.class)
 public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaConsumerGenericRecordBatch<ID, Replication<ID, DTO>> {
     private final AbsServiceCRUD<ID, ?, DTO, ?> service;

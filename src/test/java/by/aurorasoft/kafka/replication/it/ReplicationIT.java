@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import static org.springframework.test.context.jdbc.Sql.ExecutionPhase.AFTER_TEST_METHOD;
 import static org.springframework.transaction.annotation.Propagation.NOT_SUPPORTED;
 
+//TODO: update partial
 public class ReplicationIT extends AbstractSpringBootTest {
 
     @Autowired
