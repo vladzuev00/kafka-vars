@@ -61,10 +61,10 @@ public final class KafkaProducerReplicationHolderFactory {
         return new KafkaProducerReplication<>(annotation.topicName(), kafkaTemplate, schema, objectMapper);
     }
 
-    private Map<String, Object> createProducerConfigsByKeys(final Class<? extends Serializer<?>> keySerializer) {
+    private Map<String, Object> createProducerConfigsByKeys(final Class<? extends Serializer<?>> keySerializerType) {
         return Map.of(
                 BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress,
-                KEY_SERIALIZER_CLASS_CONFIG, keySerializer,
+                KEY_SERIALIZER_CLASS_CONFIG, keySerializerType,
                 VALUE_SERIALIZER_CLASS_CONFIG, AvroGenericRecordSerializer.class,
                 BATCH_SIZE_CONFIG, producerConfig.getBatchSize(),
                 LINGER_MS_CONFIG, producerConfig.getLingerMs(),

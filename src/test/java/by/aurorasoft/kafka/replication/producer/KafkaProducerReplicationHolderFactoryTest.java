@@ -9,24 +9,44 @@ import by.nhorushko.crudgeneric.v2.domain.AbstractEntity;
 import by.nhorushko.crudgeneric.v2.mapper.AbsMapperEntityDto;
 import by.nhorushko.crudgeneric.v2.service.AbsServiceRUD;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Value;
 import org.apache.avro.Schema;
 import org.apache.kafka.common.serialization.LongSerializer;
+import org.apache.kafka.common.serialization.Serializer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.kafka.core.KafkaTemplate;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
+import static java.util.Objects.requireNonNull;
+import static java.util.stream.Collectors.toMap;
+import static org.apache.kafka.clients.producer.ProducerConfig.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+import static org.springframework.util.ReflectionUtils.findField;
+import static org.springframework.util.ReflectionUtils.getField;
 
 @RunWith(MockitoJUnitRunner.class)
 public final class KafkaProducerReplicationHolderFactoryTest {
     private static final String FIELD_NAME_HOLDER_PRODUCERS_BY_SERVICES = "producersByServices";
 
+    private static final String FIELD_NAME_PRODUCER_TOPIC_NAME = "topicName";
+    private static final String FIELD_NAME_PRODUCER_OBJECT_MAPPER = "objectMapper";
+    private static final String FIELD_NAME_PRODUCER_SCHEMA = "schema";
+    private static final String FIELD_NAME_PRODUCER_KAFKA_TEMPLATE = "kafkaTemplate";
+
     private static final String GIVEN_BOOTSTRAP_ADDRESS = "127.0.0.1:9092";
+    private static final Class<? extends Serializer<?>> GIVEN_KEY_SERIALIZER_TYPE = LongSerializer.class;
 
     @Mock
     private ReplicatedServiceHolder mockedReplicatedServiceHolder;
@@ -61,9 +81,9 @@ public final class KafkaProducerReplicationHolderFactoryTest {
         final TestThirdService thirdGivenService = new TestThirdService();
         final List givenServices = List.of(firstGivenService, secondGivenService, thirdGivenService);
 
-        final Integer givenProducerBatchSize = 5;
-        final Integer givenProducerLingerMs = 10;
-        final Integer givenDeliveryTimeoutMs = 15;
+        final int givenProducerBatchSize = 5;
+        final int givenProducerLingerMs = 10;
+        final int givenDeliveryTimeoutMs = 15;
 
         when(mockedReplicatedServiceHolder.getServices()).thenReturn(givenServices);
         when(mockedProducerConfig.getBatchSize()).thenReturn(givenProducerBatchSize);
@@ -71,10 +91,111 @@ public final class KafkaProducerReplicationHolderFactoryTest {
         when(mockedProducerConfig.getDeliveryTimeoutMs()).thenReturn(givenDeliveryTimeoutMs);
 
         final KafkaProducerReplicationHolder actual = factory.create();
+        final var actualProducersInfosByServices = findProducersByServices(actual)
+                .entrySet()
+                .stream()
+                .collect(toMap(Entry::getKey, producerByService -> createProducerInfo(producerByService.getValue())));
+        final var expectedProducersInfosByServices = Map.of(
+                firstGivenService,
+                createProducerInfo("first-topic", givenProducerBatchSize, givenProducerLingerMs, givenDeliveryTimeoutMs),
 
+                secondGivenService,
+                createProducerInfo("second-topic", givenProducerBatchSize, givenProducerLingerMs, givenDeliveryTimeoutMs),
+
+                thirdGivenService,
+                createProducerInfo("third-topic", givenProducerBatchSize, givenProducerLingerMs, givenDeliveryTimeoutMs)
+        );
+        assertEquals(expectedProducersInfosByServices, actualProducersInfosByServices);
     }
 
-    private static
+    @SuppressWarnings("unchecked")
+    private static Map<AbsServiceRUD<?, ?, ?, ?, ?>, KafkaProducerReplication<?, ?>> findProducersByServices(
+            final KafkaProducerReplicationHolder holder
+    ) {
+        return getFieldValue(holder, FIELD_NAME_HOLDER_PRODUCERS_BY_SERVICES, Map.class);
+    }
+
+    private static TestProducerInfo createProducerInfo(final KafkaProducerReplication<?, ?> producer) {
+        return TestProducerInfo.builder()
+                .topicName(getTopicName(producer))
+                .objectMapper(getObjectMapper(producer))
+                .schema(getSchema(producer))
+                .keySerializerType(getKeySerializerType(producer))
+                .batchSize(getBatchSize(producer))
+                .lingerMs(getLingerMs(producer))
+                .deliveryTimeoutMs(getDeliveryTimeout(producer))
+                .build();
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    private TestProducerInfo createProducerInfo(final String topicName,
+                                                final int batchSize,
+                                                final int lingerMs,
+                                                final int deliveryTimeoutMs) {
+        return TestProducerInfo.builder()
+                .topicName(topicName)
+                .objectMapper(mockedObjectMapper)
+                .schema(mockedSchema)
+                .keySerializerType(GIVEN_KEY_SERIALIZER_TYPE)
+                .batchSize(batchSize)
+                .lingerMs(lingerMs)
+                .deliveryTimeoutMs(deliveryTimeoutMs)
+                .build();
+    }
+
+    private static String getTopicName(final KafkaProducerReplication<?, ?> producer) {
+        return getFieldValue(producer, FIELD_NAME_PRODUCER_TOPIC_NAME, String.class);
+    }
+
+    private static ObjectMapper getObjectMapper(final KafkaProducerReplication<?, ?> producer) {
+        return getFieldValue(producer, FIELD_NAME_PRODUCER_OBJECT_MAPPER, ObjectMapper.class);
+    }
+
+    private static Schema getSchema(final KafkaProducerReplication<?, ?> producer) {
+        return getFieldValue(producer, FIELD_NAME_PRODUCER_SCHEMA, Schema.class);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Class<? extends Serializer<?>> getKeySerializerType(final KafkaProducerReplication<?, ?> producer) {
+        return getKafkaTemplateProperty(producer, KEY_SERIALIZER_CLASS_CONFIG, Class.class);
+    }
+
+    private static int getBatchSize(final KafkaProducerReplication<?, ?> producer) {
+        return getKafkaTemplateProperty(producer, BATCH_SIZE_CONFIG, Integer.class);
+    }
+
+    private static int getLingerMs(final KafkaProducerReplication<?, ?> producer) {
+        return getKafkaTemplateProperty(producer, LINGER_MS_CONFIG, Integer.class);
+    }
+
+    private static int getDeliveryTimeout(final KafkaProducerReplication<?, ?> producer) {
+        return getKafkaTemplateProperty(producer, DELIVERY_TIMEOUT_MS_CONFIG, Integer.class);
+    }
+
+    private static <P> P getKafkaTemplateProperty(final KafkaProducerReplication<?, ?> producer,
+                                                  final String propertyKey,
+                                                  final Class<P> propertyType) {
+        final Object value = getKafkaTemplate(producer)
+                .getProducerFactory()
+                .getConfigurationProperties()
+                .get(propertyKey);
+        return propertyType.cast(value);
+    }
+
+    private static KafkaTemplate<?, ?> getKafkaTemplate(final KafkaProducerReplication<?, ?> producer) {
+        return getFieldValue(producer, FIELD_NAME_PRODUCER_KAFKA_TEMPLATE, KafkaTemplate.class);
+    }
+
+    private static <P, T> P getFieldValue(final T target, final String fieldName, final Class<P> valueType) {
+        final Field field = requireNonNull(findField(target.getClass(), fieldName));
+        field.setAccessible(true);
+        try {
+            final Object value = getField(field, target);
+            return valueType.cast(value);
+        } finally {
+            field.setAccessible(false);
+        }
+    }
 
     @ReplicatedService(topicName = "first-topic", keySerializer = LongSerializer.class)
     static class TestFirstService extends AbsServiceRUD<
@@ -116,5 +237,18 @@ public final class KafkaProducerReplicationHolderFactoryTest {
         public TestThirdService() {
             super(null, null);
         }
+    }
+
+    @Value
+    @AllArgsConstructor
+    @Builder
+    private static class TestProducerInfo {
+        String topicName;
+        ObjectMapper objectMapper;
+        Schema schema;
+        Class<? extends Serializer<?>> keySerializerType;
+        int batchSize;
+        int lingerMs;
+        int deliveryTimeoutMs;
     }
 }
