@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS persons;
+DROP TABLE IF EXISTS replicated_persons;
 
 CREATE TABLE persons
 (
