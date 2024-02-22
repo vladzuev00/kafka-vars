@@ -166,25 +166,23 @@ public class ReplicationIT extends AbstractSpringBootTest {
 
         assertTrue(replicationConsumer.isSuccessConsuming());
 
-        final List<Person> actualReplicatedPersons = personService.getById(
+        final List<ReplicatedPerson> actualReplicatedPersons = replicatedPersonService.getById(
                 List.of(
                         expectedFirstSavedPersonId,
                         expectedSecondSavedPersonId
                 )
         );
-        final List<Person> expectedReplicatedPersons = List.of(
-                Person.builder()
+        final List<ReplicatedPerson> expectedReplicatedPersons = List.of(
+                ReplicatedPerson.builder()
                         .id(expectedFirstSavedPersonId)
                         .name(givenFirstPersonName)
                         .surname(givenFirstPersonSurname)
-                        .patronymic(givenFirstPersonPatronymic)
                         .birthDate(givenFirstPersonBirthDate)
                         .build(),
-                Person.builder()
+                ReplicatedPerson.builder()
                         .id(expectedSecondSavedPersonId)
                         .name(givenSecondPersonName)
                         .surname(givenSecondPersonSurname)
-                        .patronymic(givenSecondPersonPatronymic)
                         .birthDate(givenSecondPersonBirthDate)
                         .build()
         );
@@ -593,5 +591,4 @@ public class ReplicationIT extends AbstractSpringBootTest {
         String surname;
         String patronymic;
     }
-
 }
