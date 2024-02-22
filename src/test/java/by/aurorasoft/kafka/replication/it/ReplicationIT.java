@@ -51,6 +51,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 import static java.lang.Thread.currentThread;
 import static java.util.Objects.hash;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.stream.IntStream.rangeClosed;
 import static org.apache.kafka.clients.admin.AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG;
 import static org.apache.kafka.clients.consumer.ConsumerConfig.*;
 import static org.junit.Assert.assertEquals;
@@ -87,6 +88,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
                 .birthDate(givenBirthDate)
                 .build();
 
+        replicationConsumer.setExpectedReplicationCount(1);
         final Person actualSavedPerson = personService.save(givenPerson);
 
         final Long expectedSavedPersonId = 1L;
@@ -114,7 +116,79 @@ public class ReplicationIT extends AbstractSpringBootTest {
     @Test
     @Sql(value = "classpath:sql-scripts/replication/it/delete-person.sql", executionPhase = AFTER_TEST_METHOD)
     public void personsAndReplicatedPersonsShouldBeSaved() {
-        throw new RuntimeException();
+        final String givenFirstPersonName = "Vlad";
+        final String givenFirstPersonSurname = "Zuev";
+        final String givenFirstPersonPatronymic = "Sergeevich";
+        final LocalDate givenFirstPersonBirthDate = LocalDate.of(2000, 2, 18);
+
+        final String givenSecondPersonName = "Ivan";
+        final String givenSecondPersonSurname = "Ivanov";
+        final String givenSecondPersonPatronymic = "Ivanovich";
+        final LocalDate givenSecondPersonBirthDate = LocalDate.of(2001, 3, 19);
+
+        final List<Person> givenPersons = List.of(
+                Person.builder()
+                        .name(givenFirstPersonName)
+                        .surname(givenFirstPersonSurname)
+                        .patronymic(givenFirstPersonPatronymic)
+                        .birthDate(givenFirstPersonBirthDate)
+                        .build(),
+                Person.builder()
+                        .name(givenSecondPersonName)
+                        .surname(givenSecondPersonSurname)
+                        .patronymic(givenSecondPersonPatronymic)
+                        .birthDate(givenSecondPersonBirthDate)
+                        .build()
+        );
+
+        replicationConsumer.setExpectedReplicationCount(2);
+        final List<Person> actualSavedPersons = personService.saveAll(givenPersons);
+
+        final Long expectedFirstSavedPersonId = 1L;
+        final Long expectedSecondSavedPersonId = 2L;
+        final List<Person> expectedSavedPersons = List.of(
+                Person.builder()
+                        .id(expectedFirstSavedPersonId)
+                        .name(givenFirstPersonName)
+                        .surname(givenFirstPersonSurname)
+                        .patronymic(givenFirstPersonPatronymic)
+                        .birthDate(givenFirstPersonBirthDate)
+                        .build(),
+                Person.builder()
+                        .id(expectedSecondSavedPersonId)
+                        .name(givenSecondPersonName)
+                        .surname(givenSecondPersonSurname)
+                        .patronymic(givenSecondPersonPatronymic)
+                        .birthDate(givenSecondPersonBirthDate)
+                        .build()
+        );
+        assertEquals(expectedSavedPersons, actualSavedPersons);
+
+        assertTrue(replicationConsumer.isSuccessConsuming());
+
+        final List<Person> actualReplicatedPersons = personService.getById(
+                List.of(
+                        expectedFirstSavedPersonId,
+                        expectedSecondSavedPersonId
+                )
+        );
+        final List<Person> expectedReplicatedPersons = List.of(
+                Person.builder()
+                        .id(expectedFirstSavedPersonId)
+                        .name(givenFirstPersonName)
+                        .surname(givenFirstPersonSurname)
+                        .patronymic(givenFirstPersonPatronymic)
+                        .birthDate(givenFirstPersonBirthDate)
+                        .build(),
+                Person.builder()
+                        .id(expectedSecondSavedPersonId)
+                        .name(givenSecondPersonName)
+                        .surname(givenSecondPersonSurname)
+                        .patronymic(givenSecondPersonPatronymic)
+                        .birthDate(givenSecondPersonBirthDate)
+                        .build()
+        );
+        assertEquals(expectedReplicatedPersons, actualReplicatedPersons);
     }
 
     @Test
@@ -135,6 +209,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
                 .birthDate(givenNewBirthDate)
                 .build();
 
+        replicationConsumer.setExpectedReplicationCount(1);
         final Person actualUpdatedPerson = personService.update(givenNewPerson);
         assertEquals(givenNewPerson, actualUpdatedPerson);
 
@@ -162,6 +237,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
         final String givenNewPatronymic = "Ivanovich";
         final PersonName givenPartial = new PersonName(givenNewName, givenNewSurname, givenNewPatronymic);
 
+        replicationConsumer.setExpectedReplicationCount(1);
         final Person actualUpdatedPerson = personService.updatePartial(givenId, givenPartial);
         final LocalDate expectedBirthDate = LocalDate.of(2000, 2, 18);
         final Person expectedUpdatedPerson = Person.builder()
@@ -192,6 +268,7 @@ public class ReplicationIT extends AbstractSpringBootTest {
     public void personAndReplicatedPersonShouldBeDeleted() {
         final Long givenId = 255L;
 
+        replicationConsumer.setExpectedReplicationCount(1);
         personService.delete(givenId);
 
         assertTrue(replicationConsumer.isSuccessConsuming());
@@ -468,7 +545,12 @@ public class ReplicationIT extends AbstractSpringBootTest {
         public KafkaConsumerPersonReplication(final AbsServiceCRUD<Long, ?, ReplicatedPerson, ?> service,
                                               final ObjectMapper objectMapper) {
             super(service, objectMapper, ReplicatedPerson.class);
-            phaser = new Phaser(2);
+            phaser = createNotTerminatedPhaser();
+        }
+
+        public void setExpectedReplicationCount(final int expectedConsumedRecordCount) {
+            rangeClosed(1, phaser.getUnarrivedParties()).forEach(i -> phaser.arriveAndDeregister());
+            phaser.bulkRegister(expectedConsumedRecordCount + 1);
         }
 
         @Override
@@ -479,12 +561,12 @@ public class ReplicationIT extends AbstractSpringBootTest {
         )
         public void listen(final List<ConsumerRecord<Long, GenericRecord>> records) {
             super.listen(records);
-            phaser.arrive();
+            records.forEach(i -> phaser.arriveAndDeregister());
         }
 
         public boolean isSuccessConsuming() {
             try {
-                final int phaseNumber = phaser.arrive();
+                final int phaseNumber = phaser.arriveAndDeregister();
                 phaser.awaitAdvanceInterruptibly(phaseNumber, WAIT_CONSUMING_SECONDS, SECONDS);
                 return true;
             } catch (final InterruptedException exception) {
@@ -493,6 +575,15 @@ public class ReplicationIT extends AbstractSpringBootTest {
             } catch (final TimeoutException exception) {
                 return false;
             }
+        }
+
+        private static Phaser createNotTerminatedPhaser() {
+            return new Phaser() {
+                @Override
+                protected boolean onAdvance(final int phase, final int registeredParties) {
+                    return false;
+                }
+            };
         }
     }
 

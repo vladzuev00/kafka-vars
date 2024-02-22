@@ -139,6 +139,10 @@
             <artifactId>javacutil</artifactId>
             <version>3.42.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+        </dependency>
 
     </dependencies>
 

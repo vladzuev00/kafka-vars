@@ -20,8 +20,6 @@ import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fie
 import static by.aurorasoft.kafka.replication.model.TransportableReplication.Fields.type;
 
 @RequiredArgsConstructor
-//TODO: remove @ReplicatedService after processor success
-@ReplicatedService(topicName = "", keySerializer = LongSerializer.class)
 public abstract class KafkaConsumerReplication<ID, DTO extends AbstractDto<ID>>
         extends KafkaConsumerGenericRecordBatch<ID, Replication<ID, DTO>> {
     private final AbsServiceCRUD<ID, ?, DTO, ?> service;
